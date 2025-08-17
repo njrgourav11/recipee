@@ -4,7 +4,7 @@
  * A search input with integrated search functionality and debounced input.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '../../atoms/Input/Input';
 import { Button } from '../../atoms/Button/Button';
 import type { SearchBarProps } from '../../../types/recipe';
@@ -14,11 +14,17 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onChange,
   onSearch,
+  onClear,
   placeholder = "Search recipes by name or cuisine...",
   loading = false,
   className = '',
 }) => {
   const [localValue, setLocalValue] = useState(value);
+
+  // Sync local value with prop value
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
