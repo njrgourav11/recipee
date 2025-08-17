@@ -1529,7 +1529,7 @@
       margin-bottom: 12px;
     }
   }
-
+  
   .app__attribute-toggle {
     font-size: 0.8rem;
     padding: 8px 10px;
@@ -1549,6 +1549,24 @@
         color: #f9fafb;
       }
     }
+
+    .app__filter-options{
+    display: flex;
+    gap: 12px;
+  }
+  .recipe-card__servings{
+    height: 40px;
+    width: 40px;
+  }
+  .recipe-card__calories{
+    height: 40px;
+    width: 40px;
+  }
+  .recipe-card__reviews{
+    height: 40px;
+    width: 40px;
+  }
+
 
     .app__cuisine-filter,
     .app__difficulty-filter {

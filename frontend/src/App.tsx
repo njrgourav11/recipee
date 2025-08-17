@@ -28,6 +28,8 @@ function App() {
     servings: true,
     calories: false,
     reviewCount: false,
+    ingredients: false,
+    instructions: false,
   });
   const { searchState, searchRecipes, setQuery: setSearchQuery, clearSearch } = useRecipeSearch('', false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -247,13 +249,7 @@ function App() {
                 <span className="app__title-icon">🍳</span>
                 Recipe Management System
               </h1>
-              <button 
-                className="app__dark-mode-toggle"
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-              >
-                {isDarkMode ? '☀️' : '🌙'}
-              </button>
+              
             </div>
             <p className="app__subtitle">
               Search and discover delicious recipes from around the world
@@ -284,8 +280,8 @@ function App() {
             />
           </section>
 
-          {(searchState.recipes.length > 0 || searchState.loading || searchState.error || hasSearched) && (
-            <section className={`app__results-section ${(searchState.recipes.length > 0 || searchState.loading || searchState.error) ? 'app__results-section--visible' : ''} ${searchState.recipes.length > 0 ? 'app__results-section--full-width' : ''}`}>
+          {(searchState.recipes.length > 0 || searchState.loading || searchState.error || (hasSearched && query.length >= 3)) && (
+            <section className={`app__results-section ${(searchState.recipes.length > 0 || searchState.loading || searchState.error || (hasSearched && query.length >= 3)) ? 'app__results-section--visible' : ''} ${searchState.recipes.length > 0 ? 'app__results-section--full-width' : ''}`}>
             {searchState.loading && (
               <div className="app__loading">
                 <Loading 
