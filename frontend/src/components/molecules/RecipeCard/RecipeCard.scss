@@ -1,0 +1,298 @@
+/**
+ * RecipeCard component styles
+ */
+
+.recipe-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: slideInUp 0.6s ease forwards;
+
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: rgba(102, 126, 234, 0.2);
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+  }
+  
+  &:hover::before {
+    opacity: 1;
+  }
+
+  &__image {
+    height: 240px;
+    overflow: hidden;
+    background-color: #f3f4f6;
+    position: relative;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+      pointer-events: none;
+    }
+  }
+  
+  &:hover &__image img {
+    transform: scale(1.05);
+  }
+
+  &__overlay {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2;
+  }
+
+  &:hover &__overlay {
+    opacity: 1;
+  }
+
+  &__favorite {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    
+    svg {
+      width: 20px;
+      height: 20px;
+      color: #ef4444;
+    }
+    
+    &:hover {
+      background: rgba(255, 255, 255, 1);
+      transform: scale(1.1);
+    }
+  }
+
+  &__placeholder {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    color: #9ca3af;
+    font-weight: 500;
+    gap: 8px;
+    
+    &-icon {
+      font-size: 2rem;
+      opacity: 0.7;
+    }
+  }
+
+  &__content {
+    padding: 24px;
+    position: relative;
+  }
+
+  &__name {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    color: #111827;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  &__cuisine {
+    color: #667eea;
+    font-size: 0.95rem;
+    margin: 0 0 16px 0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__meta {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  &__difficulty,
+  &__time,
+  &__rating {
+    background-color: #f3f4f6;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  &__difficulty {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+    
+    &--easy {
+      background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+      color: #166534;
+      border-color: #86efac;
+    }
+    
+    &--medium {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      color: #92400e;
+      border-color: #fcd34d;
+    }
+    
+    &--hard {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      color: #dc2626;
+      border-color: #f87171;
+    }
+  }
+
+  &__time {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #92400e;
+    border: 1px solid #fcd34d;
+  }
+
+  &__rating {
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    color: #065f46;
+    border: 1px solid #86efac;
+  }
+
+  &__tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  &__tag {
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    color: #4b5563;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid #d1d5db;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      transform: translateY(-1px);
+    }
+    
+    &--more {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-color: #667eea;
+      font-weight: 700;
+    }
+  }
+}
+
+@keyframes slideInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .recipe-card {
+    background: #1f2937;
+    border-color: #374151;
+
+    &__name {
+      color: #f9fafb;
+    }
+
+    &__content {
+      background: #1f2937;
+    }
+
+    &__placeholder {
+      background: linear-gradient(135deg, #374151, #4b5563);
+      color: #9ca3af;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .recipe-card {
+    &__content {
+      padding: 16px;
+    }
+
+    &__meta {
+      gap: 6px;
+    }
+
+    &__tags {
+      gap: 4px;
+    }
+
+    &__name {
+      font-size: 1.2rem;
+    }
+
+    &__cuisine {
+      font-size: 0.85rem;
+    }
+  }
+}
