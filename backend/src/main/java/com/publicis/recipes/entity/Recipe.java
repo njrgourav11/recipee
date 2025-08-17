@@ -4,23 +4,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-// import org.hibernate.search.mapper.pojo.mapping.definition.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Recipe entity representing a cooking recipe with full-text search capabilities.
- * 
- * This entity is indexed by Hibernate Search for efficient full-text searching
- * on recipe names and cuisines. It includes comprehensive validation and
- * proper JPA mappings for H2 database storage.
- * 
- * @author Recipe Management Team
- * @version 1.0.0
- */
 @Entity
 @Table(name = "recipes", indexes = {
     @Index(name = "idx_recipe_name", columnList = "name"),
@@ -28,20 +17,17 @@ import java.util.Objects;
     @Index(name = "idx_recipe_difficulty", columnList = "difficulty"),
     @Index(name = "idx_recipe_cook_time", columnList = "cook_time_minutes")
 })
-// @Indexed
 public class Recipe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // @FullTextField(analyzer = "standard")
     @Column(nullable = false, length = 255)
     @NotBlank(message = "Recipe name is required")
     @Size(min = 2, max = 255, message = "Recipe name must be between 2 and 255 characters")
     private String name;
 
-    // @FullTextField(analyzer = "standard")
     @Column(nullable = false, length = 100)
     @NotBlank(message = "Cuisine is required")
     @Size(min = 2, max = 100, message = "Cuisine must be between 2 and 100 characters")
@@ -121,17 +107,14 @@ public class Recipe {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    // Default constructor
     public Recipe() {}
 
-    // Constructor with essential fields
     public Recipe(String name, String cuisine, String difficulty) {
         this.name = name;
         this.cuisine = cuisine;
         this.difficulty = difficulty;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -260,7 +243,6 @@ public class Recipe {
         this.updatedAt = updatedAt;
     }
 
-    // Utility methods
     public void addIngredient(String ingredient) {
         if (ingredient != null && !ingredient.trim().isEmpty()) {
             this.ingredients.add(ingredient.trim());

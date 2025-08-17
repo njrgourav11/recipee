@@ -21,23 +21,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Global exception handler for the Recipe Management System.
- * 
- * This class handles all exceptions thrown by the application and provides
- * consistent error responses with proper HTTP status codes and error messages.
- * 
- * @author Recipe Management Team
- * @version 1.0.0
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    /**
-     * Handles validation errors for request body validation.
-     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(
             MethodArgumentNotValidException ex, WebRequest request) {
@@ -62,9 +50,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
-    /**
-     * Handles constraint violation exceptions.
-     */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(
             ConstraintViolationException ex, WebRequest request) {
@@ -88,9 +73,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
-    /**
-     * Handles missing request parameter exceptions.
-     */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ErrorResponse> handleMissingServletRequestParameter(
             MissingServletRequestParameterException ex, WebRequest request) {
@@ -107,9 +89,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
-    /**
-     * Handles method argument type mismatch exceptions.
-     */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(
             MethodArgumentTypeMismatchException ex, WebRequest request) {
@@ -129,9 +108,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
-    /**
-     * Handles HTTP message not readable exceptions.
-     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex, WebRequest request) {
@@ -148,9 +124,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
-    /**
-     * Handles recipe not found exceptions.
-     */
     @ExceptionHandler(RecipeNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleRecipeNotFoundException(
             RecipeNotFoundException ex, WebRequest request) {
@@ -167,9 +140,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.notFound().build();
     }
 
-    /**
-     * Handles external API exceptions.
-     */
     @ExceptionHandler(ExternalApiException.class)
     public ResponseEntity<ErrorResponse> handleExternalApiException(
             ExternalApiException ex, WebRequest request) {
@@ -186,9 +156,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
     }
 
-    /**
-     * Handles data loading exceptions.
-     */
     @ExceptionHandler(DataLoadingException.class)
     public ResponseEntity<ErrorResponse> handleDataLoadingException(
             DataLoadingException ex, WebRequest request) {
@@ -205,9 +172,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.internalServerError().body(errorResponse);
     }
 
-    /**
-     * Handles search service exceptions.
-     */
     @ExceptionHandler(SearchServiceException.class)
     public ResponseEntity<ErrorResponse> handleSearchServiceException(
             SearchServiceException ex, WebRequest request) {
@@ -224,9 +188,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.internalServerError().body(errorResponse);
     }
 
-    /**
-     * Handles illegal argument exceptions.
-     */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
             IllegalArgumentException ex, WebRequest request) {
@@ -243,9 +204,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
-    /**
-     * Handles all other unexpected exceptions.
-     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(
             Exception ex, WebRequest request) {
@@ -262,9 +220,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.internalServerError().body(errorResponse);
     }
 
-    /**
-     * Standard error response structure.
-     */
     public static class ErrorResponse {
         private LocalDateTime timestamp;
         private int status;
@@ -281,13 +236,12 @@ public class GlobalExceptionHandler {
             this.path = path;
         }
 
-        public ErrorResponse(int status, String error, String message, String path, 
+        public ErrorResponse(int status, String error, String message, String path,
                            Map<String, String> validationErrors) {
             this(status, error, message, path);
             this.validationErrors = validationErrors;
         }
 
-        // Getters
         public LocalDateTime getTimestamp() { return timestamp; }
         public int getStatus() { return status; }
         public String getError() { return error; }
@@ -295,14 +249,13 @@ public class GlobalExceptionHandler {
         public String getPath() { return path; }
         public Map<String, String> getValidationErrors() { return validationErrors; }
 
-        // Setters
         public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
         public void setStatus(int status) { this.status = status; }
         public void setError(String error) { this.error = error; }
         public void setMessage(String message) { this.message = message; }
         public void setPath(String path) { this.path = path; }
-        public void setValidationErrors(Map<String, String> validationErrors) { 
-            this.validationErrors = validationErrors; 
+        public void setValidationErrors(Map<String, String> validationErrors) {
+            this.validationErrors = validationErrors;
         }
     }
 }

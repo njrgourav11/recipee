@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RecipeService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Recipe Management Backend</a> &gt; <a href="index.source.html" class="el_package">com.publicis.recipes.service</a> &gt; <span class="el_source">RecipeService.java</span></div><h1>RecipeService.java</h1><pre class="source lang-java linenums">package com.publicis.recipes.service;
+
+import com.publicis.recipes.dto.RecipeDto;
+import com.publicis.recipes.dto.RecipeMapper;
+import com.publicis.recipes.entity.Recipe;
+import com.publicis.recipes.repository.RecipeRepository;
+import com.publicis.recipes.repository.RecipeSearchRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+@Transactional(readOnly = true)
+public class RecipeService {
+
+<span class="fc" id="L27">    private static final Logger logger = LoggerFactory.getLogger(RecipeService.class);</span>
+
+    private final RecipeRepository recipeRepository;
+    private final RecipeMapper recipeMapper;
+
+    public RecipeService(RecipeRepository recipeRepository,
+<span class="fc" id="L33">                        RecipeMapper recipeMapper) {</span>
+<span class="fc" id="L34">        this.recipeRepository = recipeRepository;</span>
+<span class="fc" id="L35">        this.recipeMapper = recipeMapper;</span>
+<span class="fc" id="L36">    }</span>
+
+    public Page&lt;RecipeDto&gt; searchRecipes(String query, Pageable pageable) {
+<span class="fc" id="L39">        logger.debug(&quot;Searching recipes with query: '{}', page: {}, size: {}&quot;,</span>
+<span class="fc" id="L40">                    query, pageable.getPageNumber(), pageable.getPageSize());</span>
+
+        Page&lt;Recipe&gt; recipePage;
+
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (StringUtils.hasText(query)) {</span>
+<span class="fc" id="L45">            logger.debug(&quot;Using database search for query: '{}'&quot;, query);</span>
+<span class="fc" id="L46">            recipePage = recipeRepository.findByNameOrCuisineContainingIgnoreCase(query.trim(), pageable);</span>
+        } else {
+<span class="fc" id="L48">            logger.debug(&quot;No search query provided, returning all recipes&quot;);</span>
+<span class="fc" id="L49">            recipePage = recipeRepository.findAll(pageable);</span>
+        }
+
+<span class="fc" id="L52">        logger.debug(&quot;Search returned {} recipes out of {} total&quot;, </span>
+<span class="fc" id="L53">                    recipePage.getNumberOfElements(), recipePage.getTotalElements());</span>
+
+<span class="fc" id="L55">        return recipePage.map(recipeMapper::toDto);</span>
+    }
+
+    public Optional&lt;RecipeDto&gt; findById(Long id) {
+<span class="fc" id="L59">        logger.debug(&quot;Finding recipe by ID: {}&quot;, id);</span>
+        
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if (id == null) {</span>
+<span class="fc" id="L62">            logger.warn(&quot;Recipe ID is null&quot;);</span>
+<span class="fc" id="L63">            return Optional.empty();</span>
+        }
+
+<span class="fc" id="L66">        Optional&lt;Recipe&gt; recipe = recipeRepository.findById(id);</span>
+        
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if (recipe.isPresent()) {</span>
+<span class="fc" id="L69">            logger.debug(&quot;Found recipe: {}&quot;, recipe.get().getName());</span>
+        } else {
+<span class="fc" id="L71">            logger.debug(&quot;Recipe not found with ID: {}&quot;, id);</span>
+        }
+
+<span class="fc" id="L74">        return recipe.map(recipeMapper::toDto);</span>
+    }
+
+    public Page&lt;RecipeDto&gt; getAllRecipes(Pageable pageable) {
+<span class="fc" id="L78">        logger.debug(&quot;Getting all recipes with pagination: page {}, size {}&quot;, </span>
+<span class="fc" id="L79">                    pageable.getPageNumber(), pageable.getPageSize());</span>
+
+<span class="fc" id="L81">        Page&lt;Recipe&gt; recipePage = recipeRepository.findAll(pageable);</span>
+        
+<span class="fc" id="L83">        logger.debug(&quot;Retrieved {} recipes out of {} total&quot;, </span>
+<span class="fc" id="L84">                    recipePage.getNumberOfElements(), recipePage.getTotalElements());</span>
+
+<span class="fc" id="L86">        return recipePage.map(recipeMapper::toDto);</span>
+    }
+
+    public Page&lt;RecipeDto&gt; findByCuisine(String cuisine, Pageable pageable) {
+<span class="fc" id="L90">        logger.debug(&quot;Finding recipes by cuisine: '{}'&quot;, cuisine);</span>
+
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if (!StringUtils.hasText(cuisine)) {</span>
+<span class="fc" id="L93">            return Page.empty(pageable);</span>
+        }
+
+<span class="fc" id="L96">        Page&lt;Recipe&gt; recipePage = recipeRepository.findByCuisineContainingIgnoreCase(cuisine.trim(), pageable);</span>
+
+<span class="fc" id="L98">        return recipePage.map(recipeMapper::toDto);</span>
+    }
+
+    public Page&lt;RecipeDto&gt; findByDifficulty(String difficulty, Pageable pageable) {
+<span class="fc" id="L102">        logger.debug(&quot;Finding recipes by difficulty: '{}'&quot;, difficulty);</span>
+
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">        if (!StringUtils.hasText(difficulty)) {</span>
+<span class="nc" id="L105">            return Page.empty(pageable);</span>
+        }
+
+<span class="fc" id="L108">        Page&lt;Recipe&gt; recipePage = recipeRepository.findByDifficulty(difficulty.trim(), pageable);</span>
+<span class="fc" id="L109">        return recipePage.map(recipeMapper::toDto);</span>
+    }
+
+    public Page&lt;RecipeDto&gt; findByMaxCookTime(Integer maxCookTime, Pageable pageable) {
+<span class="fc" id="L113">        logger.debug(&quot;Finding recipes with max cook time: {} minutes&quot;, maxCookTime);</span>
+
+<span class="pc bpc" id="L115" title="1 of 4 branches missed.">        if (maxCookTime == null || maxCookTime &lt; 0) {</span>
+<span class="fc" id="L116">            return Page.empty(pageable);</span>
+        }
+
+<span class="fc" id="L119">        Page&lt;Recipe&gt; recipePage = recipeRepository.findByCookTimeMinutesLessThanEqual(maxCookTime, pageable);</span>
+<span class="fc" id="L120">        return recipePage.map(recipeMapper::toDto);</span>
+    }
+
+    public Page&lt;RecipeDto&gt; findByMinRating(Double minRating, Pageable pageable) {
+<span class="fc" id="L124">        logger.debug(&quot;Finding recipes with min rating: {}&quot;, minRating);</span>
+
+<span class="pc bpc" id="L126" title="2 of 6 branches missed.">        if (minRating == null || minRating &lt; 0.0 || minRating &gt; 5.0) {</span>
+<span class="fc" id="L127">            return Page.empty(pageable);</span>
+        }
+
+<span class="fc" id="L130">        Page&lt;Recipe&gt; recipePage = recipeRepository.findByRatingGreaterThanEqual(minRating, pageable);</span>
+<span class="fc" id="L131">        return recipePage.map(recipeMapper::toDto);</span>
+    }
+
+    public Page&lt;RecipeDto&gt; findByTags(List&lt;String&gt; tags, Pageable pageable) {
+<span class="fc" id="L135">        logger.debug(&quot;Finding recipes by tags: {}&quot;, tags);</span>
+
+<span class="pc bpc" id="L137" title="1 of 4 branches missed.">        if (tags == null || tags.isEmpty()) {</span>
+<span class="fc" id="L138">            return Page.empty(pageable);</span>
+        }
+
+<span class="fc" id="L141">        List&lt;String&gt; cleanTags = tags.stream()</span>
+<span class="fc" id="L142">            .filter(StringUtils::hasText)</span>
+<span class="fc" id="L143">            .map(String::trim)</span>
+<span class="fc" id="L144">            .collect(Collectors.toList());</span>
+
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">        if (cleanTags.isEmpty()) {</span>
+<span class="nc" id="L147">            return Page.empty(pageable);</span>
+        }
+
+<span class="fc" id="L150">        Page&lt;Recipe&gt; recipePage = recipeRepository.findByTagsIn(cleanTags, pageable);</span>
+<span class="fc" id="L151">        return recipePage.map(recipeMapper::toDto);</span>
+    }
+
+    public Page&lt;RecipeDto&gt; getTopRatedRecipes(Pageable pageable) {
+<span class="fc" id="L155">        logger.debug(&quot;Getting top-rated recipes&quot;);</span>
+
+<span class="fc" id="L157">        Page&lt;Recipe&gt; recipePage = recipeRepository.findTopRatedRecipes(pageable);</span>
+<span class="fc" id="L158">        return recipePage.map(recipeMapper::toDto);</span>
+    }
+
+    public Page&lt;RecipeDto&gt; getRecentRecipes(Pageable pageable) {
+<span class="fc" id="L162">        logger.debug(&quot;Getting recent recipes&quot;);</span>
+
+<span class="fc" id="L164">        Page&lt;Recipe&gt; recipePage = recipeRepository.findRecentRecipes(pageable);</span>
+<span class="fc" id="L165">        return recipePage.map(recipeMapper::toDto);</span>
+    }
+
+    public List&lt;String&gt; getSearchSuggestions(String partialQuery, int maxSuggestions) {
+<span class="fc" id="L169">        logger.debug(&quot;Getting search suggestions for: '{}'&quot;, partialQuery);</span>
+
+<span class="pc bpc" id="L171" title="1 of 4 branches missed.">        if (!StringUtils.hasText(partialQuery) || partialQuery.trim().length() &lt; 2) {</span>
+<span class="fc" id="L172">            return List.of();</span>
+        }
+
+<span class="fc" id="L175">        Pageable pageable = PageRequest.of(0, maxSuggestions, Sort.by(&quot;name&quot;));</span>
+<span class="fc" id="L176">        Page&lt;Recipe&gt; recipes = recipeRepository.findByNameContainingIgnoreCase(partialQuery.trim(), pageable);</span>
+<span class="fc" id="L177">        return recipes.getContent().stream()</span>
+<span class="fc" id="L178">            .map(Recipe::getName)</span>
+<span class="fc" id="L179">            .distinct()</span>
+<span class="fc" id="L180">            .limit(maxSuggestions)</span>
+<span class="fc" id="L181">            .collect(Collectors.toList());</span>
+    }
+
+    public Map&lt;String, Object&gt; getRecipeStatistics() {
+<span class="fc" id="L185">        logger.debug(&quot;Getting recipe statistics&quot;);</span>
+
+<span class="fc" id="L187">        long totalRecipes = recipeRepository.count();</span>
+<span class="fc" id="L188">        List&lt;Object[]&gt; cuisineCounts = recipeRepository.countRecipesByCuisine();</span>
+<span class="fc" id="L189">        List&lt;Object[]&gt; difficultyCounts = recipeRepository.countRecipesByDifficulty();</span>
+
+<span class="fc" id="L191">        Map&lt;String, Long&gt; cuisineStats = cuisineCounts.stream()</span>
+<span class="fc" id="L192">            .collect(Collectors.toMap(</span>
+<span class="fc" id="L193">                row -&gt; (String) row[0],</span>
+<span class="fc" id="L194">                row -&gt; (Long) row[1]</span>
+            ));
+
+<span class="fc" id="L197">        Map&lt;String, Long&gt; difficultyStats = difficultyCounts.stream()</span>
+<span class="fc" id="L198">            .collect(Collectors.toMap(</span>
+<span class="fc" id="L199">                row -&gt; (String) row[0],</span>
+<span class="fc" id="L200">                row -&gt; (Long) row[1]</span>
+            ));
+
+<span class="fc" id="L203">        return Map.of(</span>
+<span class="fc" id="L204">            &quot;totalRecipes&quot;, totalRecipes,</span>
+            &quot;cuisineDistribution&quot;, cuisineStats,
+            &quot;difficultyDistribution&quot;, difficultyStats,
+<span class="fc" id="L207">            &quot;searchIndexReady&quot;, false</span>
+        );
+    }
+
+    public long getTotalRecipeCount() {
+<span class="fc" id="L212">        long count = recipeRepository.count();</span>
+<span class="fc" id="L213">        logger.debug(&quot;Total recipe count: {}&quot;, count);</span>
+<span class="fc" id="L214">        return count;</span>
+    }
+
+    public boolean hasRecipes() {
+<span class="fc bfc" id="L218" title="All 2 branches covered.">        boolean exists = recipeRepository.count() &gt; 0;</span>
+<span class="fc" id="L219">        logger.debug(&quot;Recipes exist in database: {}&quot;, exists);</span>
+<span class="fc" id="L220">        return exists;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

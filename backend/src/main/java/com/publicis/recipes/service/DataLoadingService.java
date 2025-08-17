@@ -14,18 +14,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Service for loading recipe data from external sources into the database.
- * 
- * This service handles:
- * - Asynchronous data loading from external APIs
- * - Batch processing and database operations
- * - Error handling and recovery
- * - Data validation and deduplication
- * 
- * @author Recipe Management Team
- * @version 1.0.0
- */
 @Service
 public class DataLoadingService {
 
@@ -39,17 +27,12 @@ public class DataLoadingService {
     private volatile int lastLoadCount = 0;
     private volatile String lastLoadStatus = "Never loaded";
 
-    public DataLoadingService(ExternalRecipeService externalRecipeService, 
+    public DataLoadingService(ExternalRecipeService externalRecipeService,
                              RecipeRepository recipeRepository) {
         this.externalRecipeService = externalRecipeService;
         this.recipeRepository = recipeRepository;
     }
 
-    /**
-     * Asynchronously loads recipes from external API into the database.
-     * 
-     * @return CompletableFuture containing the number of recipes loaded
-     */
     @Async
     @Transactional
     public CompletableFuture<DataLoadResult> loadRecipesFromExternalApi() {
@@ -66,7 +49,6 @@ public class DataLoadingService {
         try {
             logger.info("Starting recipe data loading from external API");
             
-            // Check if external API is accessible
             if (!externalRecipeService.isApiAccessible()) {
                 String errorMsg = "External API is not accessible";
                 logger.error(errorMsg);
@@ -76,7 +58,6 @@ public class DataLoadingService {
                 );
             }
 
-            // Fetch recipes from external API
             List<Recipe> externalRecipes = externalRecipeService.fetchAllRecipes();
             
             if (externalRecipes.isEmpty()) {
@@ -90,14 +71,12 @@ public class DataLoadingService {
 
             logger.info("Received {} recipes from external API", externalRecipes.size());
 
-            // Clear existing data (for fresh load)
             long existingCount = recipeRepository.count();
             if (existingCount > 0) {
                 logger.info("Clearing {} existing recipes from database", existingCount);
                 recipeRepository.deleteAll();
             }
 
-            // Save new recipes in batches
             int batchSize = 50;
             int totalSaved = 0;
             int batchCount = 0;
@@ -114,11 +93,9 @@ public class DataLoadingService {
                     logger.debug("Saved batch {} with {} recipes", batchCount, savedBatch.size());
                 } catch (Exception e) {
                     logger.error("Failed to save batch {}: {}", batchCount + 1, e.getMessage());
-                    // Continue with next batch
                 }
             }
 
-            // Update loading status
             lastLoadTime = LocalDateTime.now();
             lastLoadCount = totalSaved;
             lastLoadStatus = "Success";
@@ -150,11 +127,6 @@ public class DataLoadingService {
         }
     }
 
-    /**
-     * Gets the current loading status.
-     * 
-     * @return DataLoadStatus containing current loading information
-     */
     public DataLoadStatus getLoadingStatus() {
         return new DataLoadStatus(
             isLoading,
@@ -165,27 +137,14 @@ public class DataLoadingService {
         );
     }
 
-    /**
-     * Checks if data loading is currently in progress.
-     * 
-     * @return true if loading is in progress, false otherwise
-     */
     public boolean isLoadingInProgress() {
         return isLoading;
     }
 
-    /**
-     * Gets the total number of recipes currently in the database.
-     * 
-     * @return total recipe count
-     */
     public long getTotalRecipeCount() {
         return recipeRepository.count();
     }
 
-    /**
-     * Data class representing the result of a data loading operation.
-     */
     public static class DataLoadResult {
         private final int count;
         private final String message;
@@ -205,9 +164,6 @@ public class DataLoadingService {
         public LocalDateTime getTimestamp() { return timestamp; }
     }
 
-    /**
-     * Data class representing the current loading status.
-     */
     public static class DataLoadStatus {
         private final boolean isLoading;
         private final LocalDateTime lastLoadTime;

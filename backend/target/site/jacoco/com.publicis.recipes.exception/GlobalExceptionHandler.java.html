@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Recipe Management Backend</a> &gt; <a href="index.source.html" class="el_package">com.publicis.recipes.exception</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package com.publicis.recipes.exception;
+
+import com.publicis.recipes.external.ExternalApiException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@RestControllerAdvice
+<span class="fc" id="L25">public class GlobalExceptionHandler {</span>
+
+<span class="fc" id="L27">    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);</span>
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleValidationExceptions(
+            MethodArgumentNotValidException ex, WebRequest request) {
+        
+<span class="nc" id="L33">        logger.warn(&quot;Validation error: {}&quot;, ex.getMessage());</span>
+
+<span class="nc" id="L35">        Map&lt;String, String&gt; errors = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L36">        ex.getBindingResult().getAllErrors().forEach((error) -&gt; {</span>
+<span class="nc" id="L37">            String fieldName = ((FieldError) error).getField();</span>
+<span class="nc" id="L38">            String errorMessage = error.getDefaultMessage();</span>
+<span class="nc" id="L39">            errors.put(fieldName, errorMessage);</span>
+<span class="nc" id="L40">        });</span>
+
+<span class="nc" id="L42">        ErrorResponse errorResponse = new ErrorResponse(</span>
+<span class="nc" id="L43">            HttpStatus.BAD_REQUEST.value(),</span>
+            &quot;Validation failed&quot;,
+            &quot;Invalid input data provided&quot;,
+<span class="nc" id="L46">            request.getDescription(false),</span>
+            errors
+        );
+
+<span class="nc" id="L50">        return ResponseEntity.badRequest().body(errorResponse);</span>
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleConstraintViolationException(
+            ConstraintViolationException ex, WebRequest request) {
+        
+<span class="fc" id="L57">        logger.warn(&quot;Constraint violation: {}&quot;, ex.getMessage());</span>
+
+<span class="fc" id="L59">        Map&lt;String, String&gt; errors = ex.getConstraintViolations().stream()</span>
+<span class="fc" id="L60">            .collect(Collectors.toMap(</span>
+<span class="fc" id="L61">                violation -&gt; violation.getPropertyPath().toString(),</span>
+                ConstraintViolation::getMessage
+            ));
+
+<span class="fc" id="L65">        ErrorResponse errorResponse = new ErrorResponse(</span>
+<span class="fc" id="L66">            HttpStatus.BAD_REQUEST.value(),</span>
+            &quot;Constraint violation&quot;,
+            &quot;Request parameters do not meet validation requirements&quot;,
+<span class="fc" id="L69">            request.getDescription(false),</span>
+            errors
+        );
+
+<span class="fc" id="L73">        return ResponseEntity.badRequest().body(errorResponse);</span>
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleMissingServletRequestParameter(
+            MissingServletRequestParameterException ex, WebRequest request) {
+        
+<span class="fc" id="L80">        logger.warn(&quot;Missing request parameter: {}&quot;, ex.getMessage());</span>
+
+<span class="fc" id="L82">        ErrorResponse errorResponse = new ErrorResponse(</span>
+<span class="fc" id="L83">            HttpStatus.BAD_REQUEST.value(),</span>
+            &quot;Missing parameter&quot;,
+<span class="fc" id="L85">            String.format(&quot;Required parameter '%s' is missing&quot;, ex.getParameterName()),</span>
+<span class="fc" id="L86">            request.getDescription(false)</span>
+        );
+
+<span class="fc" id="L89">        return ResponseEntity.badRequest().body(errorResponse);</span>
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleMethodArgumentTypeMismatch(
+            MethodArgumentTypeMismatchException ex, WebRequest request) {
+        
+<span class="fc" id="L96">        logger.warn(&quot;Method argument type mismatch: {}&quot;, ex.getMessage());</span>
+
+<span class="fc" id="L98">        String message = String.format(&quot;Parameter '%s' should be of type %s&quot;, </span>
+<span class="fc" id="L99">            ex.getName(), ex.getRequiredType().getSimpleName());</span>
+
+<span class="fc" id="L101">        ErrorResponse errorResponse = new ErrorResponse(</span>
+<span class="fc" id="L102">            HttpStatus.BAD_REQUEST.value(),</span>
+            &quot;Invalid parameter type&quot;,
+            message,
+<span class="fc" id="L105">            request.getDescription(false)</span>
+        );
+
+<span class="fc" id="L108">        return ResponseEntity.badRequest().body(errorResponse);</span>
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex, WebRequest request) {
+        
+<span class="nc" id="L115">        logger.warn(&quot;HTTP message not readable: {}&quot;, ex.getMessage());</span>
+
+<span class="nc" id="L117">        ErrorResponse errorResponse = new ErrorResponse(</span>
+<span class="nc" id="L118">            HttpStatus.BAD_REQUEST.value(),</span>
+            &quot;Malformed JSON&quot;,
+            &quot;Request body contains invalid JSON&quot;,
+<span class="nc" id="L121">            request.getDescription(false)</span>
+        );
+
+<span class="nc" id="L124">        return ResponseEntity.badRequest().body(errorResponse);</span>
+    }
+
+    @ExceptionHandler(RecipeNotFoundException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleRecipeNotFoundException(
+            RecipeNotFoundException ex, WebRequest request) {
+        
+<span class="nc" id="L131">        logger.info(&quot;Recipe not found: {}&quot;, ex.getMessage());</span>
+
+<span class="nc" id="L133">        ErrorResponse errorResponse = new ErrorResponse(</span>
+<span class="nc" id="L134">            HttpStatus.NOT_FOUND.value(),</span>
+            &quot;Recipe not found&quot;,
+<span class="nc" id="L136">            ex.getMessage(),</span>
+<span class="nc" id="L137">            request.getDescription(false)</span>
+        );
+
+<span class="nc" id="L140">        return ResponseEntity.notFound().build();</span>
+    }
+
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleExternalApiException(
+            ExternalApiException ex, WebRequest request) {
+        
+<span class="nc" id="L147">        logger.error(&quot;External API error: {}&quot;, ex.getMessage(), ex);</span>
+
+<span class="nc" id="L149">        ErrorResponse errorResponse = new ErrorResponse(</span>
+<span class="nc" id="L150">            HttpStatus.SERVICE_UNAVAILABLE.value(),</span>
+            &quot;External service error&quot;,
+            &quot;Unable to fetch data from external service. Please try again later.&quot;,
+<span class="nc" id="L153">            request.getDescription(false)</span>
+        );
+
+<span class="nc" id="L156">        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);</span>
+    }
+
+    @ExceptionHandler(DataLoadingException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleDataLoadingException(
+            DataLoadingException ex, WebRequest request) {
+        
+<span class="nc" id="L163">        logger.error(&quot;Data loading error: {}&quot;, ex.getMessage(), ex);</span>
+
+<span class="nc" id="L165">        ErrorResponse errorResponse = new ErrorResponse(</span>
+<span class="nc" id="L166">            HttpStatus.INTERNAL_SERVER_ERROR.value(),</span>
+            &quot;Data loading error&quot;,
+<span class="nc" id="L168">            ex.getMessage(),</span>
+<span class="nc" id="L169">            request.getDescription(false)</span>
+        );
+
+<span class="nc" id="L172">        return ResponseEntity.internalServerError().body(errorResponse);</span>
+    }
+
+    @ExceptionHandler(SearchServiceException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleSearchServiceException(
+            SearchServiceException ex, WebRequest request) {
+        
+<span class="nc" id="L179">        logger.error(&quot;Search service error: {}&quot;, ex.getMessage(), ex);</span>
+
+<span class="nc" id="L181">        ErrorResponse errorResponse = new ErrorResponse(</span>
+<span class="nc" id="L182">            HttpStatus.INTERNAL_SERVER_ERROR.value(),</span>
+            &quot;Search service error&quot;,
+            &quot;Search functionality is temporarily unavailable. Please try again later.&quot;,
+<span class="nc" id="L185">            request.getDescription(false)</span>
+        );
+
+<span class="nc" id="L188">        return ResponseEntity.internalServerError().body(errorResponse);</span>
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleIllegalArgumentException(
+            IllegalArgumentException ex, WebRequest request) {
+        
+<span class="nc" id="L195">        logger.warn(&quot;Illegal argument: {}&quot;, ex.getMessage());</span>
+
+<span class="nc" id="L197">        ErrorResponse errorResponse = new ErrorResponse(</span>
+<span class="nc" id="L198">            HttpStatus.BAD_REQUEST.value(),</span>
+            &quot;Invalid argument&quot;,
+<span class="nc" id="L200">            ex.getMessage(),</span>
+<span class="nc" id="L201">            request.getDescription(false)</span>
+        );
+
+<span class="nc" id="L204">        return ResponseEntity.badRequest().body(errorResponse);</span>
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleGlobalException(
+            Exception ex, WebRequest request) {
+        
+<span class="nc" id="L211">        logger.error(&quot;Unexpected error occurred&quot;, ex);</span>
+
+<span class="nc" id="L213">        ErrorResponse errorResponse = new ErrorResponse(</span>
+<span class="nc" id="L214">            HttpStatus.INTERNAL_SERVER_ERROR.value(),</span>
+            &quot;Internal server error&quot;,
+            &quot;An unexpected error occurred. Please try again later.&quot;,
+<span class="nc" id="L217">            request.getDescription(false)</span>
+        );
+
+<span class="nc" id="L220">        return ResponseEntity.internalServerError().body(errorResponse);</span>
+    }
+
+    public static class ErrorResponse {
+        private LocalDateTime timestamp;
+        private int status;
+        private String error;
+        private String message;
+        private String path;
+        private Map&lt;String, String&gt; validationErrors;
+
+<span class="fc" id="L231">        public ErrorResponse(int status, String error, String message, String path) {</span>
+<span class="fc" id="L232">            this.timestamp = LocalDateTime.now();</span>
+<span class="fc" id="L233">            this.status = status;</span>
+<span class="fc" id="L234">            this.error = error;</span>
+<span class="fc" id="L235">            this.message = message;</span>
+<span class="fc" id="L236">            this.path = path;</span>
+<span class="fc" id="L237">        }</span>
+
+        public ErrorResponse(int status, String error, String message, String path,
+                           Map&lt;String, String&gt; validationErrors) {
+<span class="fc" id="L241">            this(status, error, message, path);</span>
+<span class="fc" id="L242">            this.validationErrors = validationErrors;</span>
+<span class="fc" id="L243">        }</span>
+
+<span class="fc" id="L245">        public LocalDateTime getTimestamp() { return timestamp; }</span>
+<span class="fc" id="L246">        public int getStatus() { return status; }</span>
+<span class="fc" id="L247">        public String getError() { return error; }</span>
+<span class="fc" id="L248">        public String getMessage() { return message; }</span>
+<span class="fc" id="L249">        public String getPath() { return path; }</span>
+<span class="fc" id="L250">        public Map&lt;String, String&gt; getValidationErrors() { return validationErrors; }</span>
+
+<span class="nc" id="L252">        public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }</span>
+<span class="nc" id="L253">        public void setStatus(int status) { this.status = status; }</span>
+<span class="nc" id="L254">        public void setError(String error) { this.error = error; }</span>
+<span class="nc" id="L255">        public void setMessage(String message) { this.message = message; }</span>
+<span class="nc" id="L256">        public void setPath(String path) { this.path = path; }</span>
+        public void setValidationErrors(Map&lt;String, String&gt; validationErrors) {
+<span class="nc" id="L258">            this.validationErrors = validationErrors;</span>
+<span class="nc" id="L259">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

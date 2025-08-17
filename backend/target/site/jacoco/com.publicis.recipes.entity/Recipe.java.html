@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Recipe.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Recipe Management Backend</a> &gt; <a href="index.source.html" class="el_package">com.publicis.recipes.entity</a> &gt; <span class="el_source">Recipe.java</span></div><h1>Recipe.java</h1><pre class="source lang-java linenums">package com.publicis.recipes.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@Entity
+@Table(name = &quot;recipes&quot;, indexes = {
+    @Index(name = &quot;idx_recipe_name&quot;, columnList = &quot;name&quot;),
+    @Index(name = &quot;idx_recipe_cuisine&quot;, columnList = &quot;cuisine&quot;),
+    @Index(name = &quot;idx_recipe_difficulty&quot;, columnList = &quot;difficulty&quot;),
+    @Index(name = &quot;idx_recipe_cook_time&quot;, columnList = &quot;cook_time_minutes&quot;)
+})
+public class Recipe {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 255)
+    @NotBlank(message = &quot;Recipe name is required&quot;)
+    @Size(min = 2, max = 255, message = &quot;Recipe name must be between 2 and 255 characters&quot;)
+    private String name;
+
+    @Column(nullable = false, length = 100)
+    @NotBlank(message = &quot;Cuisine is required&quot;)
+    @Size(min = 2, max = 100, message = &quot;Cuisine must be between 2 and 100 characters&quot;)
+    private String cuisine;
+
+    @Column(nullable = false, length = 50)
+    @NotBlank(message = &quot;Difficulty level is required&quot;)
+    @Pattern(regexp = &quot;Easy|Medium|Hard&quot;, message = &quot;Difficulty must be Easy, Medium, or Hard&quot;)
+    private String difficulty;
+
+    @Column(name = &quot;prep_time_minutes&quot;)
+    @Min(value = 0, message = &quot;Preparation time cannot be negative&quot;)
+    @Max(value = 1440, message = &quot;Preparation time cannot exceed 24 hours&quot;)
+    private Integer prepTimeMinutes;
+
+    @Column(name = &quot;cook_time_minutes&quot;)
+    @Min(value = 0, message = &quot;Cook time cannot be negative&quot;)
+    @Max(value = 1440, message = &quot;Cook time cannot exceed 24 hours&quot;)
+    private Integer cookTimeMinutes;
+
+    @Column(name = &quot;servings&quot;)
+    @Min(value = 1, message = &quot;Servings must be at least 1&quot;)
+    @Max(value = 50, message = &quot;Servings cannot exceed 50&quot;)
+    private Integer servings;
+
+<span class="pc" id="L56">    @ElementCollection(fetch = FetchType.EAGER)</span>
+    @CollectionTable(
+        name = &quot;recipe_ingredients&quot;,
+        joinColumns = @JoinColumn(name = &quot;recipe_id&quot;)
+    )
+    @Column(name = &quot;ingredient&quot;, length = 500)
+    @Size(min = 1, message = &quot;Recipe must have at least one ingredient&quot;)
+    private List&lt;String&gt; ingredients = new ArrayList&lt;&gt;();
+
+<span class="pc" id="L65">    @ElementCollection(fetch = FetchType.EAGER)</span>
+    @CollectionTable(
+        name = &quot;recipe_instructions&quot;,
+        joinColumns = @JoinColumn(name = &quot;recipe_id&quot;)
+    )
+    @Column(name = &quot;instruction&quot;, length = 1000)
+    @OrderColumn(name = &quot;step_order&quot;)
+    @Size(min = 1, message = &quot;Recipe must have at least one instruction&quot;)
+    private List&lt;String&gt; instructions = new ArrayList&lt;&gt;();
+
+<span class="pc" id="L75">    @ElementCollection(fetch = FetchType.EAGER)</span>
+    @CollectionTable(
+        name = &quot;recipe_tags&quot;,
+        joinColumns = @JoinColumn(name = &quot;recipe_id&quot;)
+    )
+    @Column(name = &quot;tag&quot;, length = 50)
+    private List&lt;String&gt; tags = new ArrayList&lt;&gt;();
+
+    @Column(name = &quot;image&quot;, length = 500)
+    @Pattern(regexp = &quot;^(https?://.*\\.(jpg|jpeg|png|gif|webp))?$&quot;, 
+             message = &quot;Image must be a valid URL ending with jpg, jpeg, png, gif, or webp&quot;)
+    private String image;
+
+    @Column(name = &quot;rating&quot;)
+    @DecimalMin(value = &quot;0.0&quot;, message = &quot;Rating cannot be negative&quot;)
+    @DecimalMax(value = &quot;5.0&quot;, message = &quot;Rating cannot exceed 5.0&quot;)
+    private Double rating;
+
+    @Column(name = &quot;review_count&quot;)
+    @Min(value = 0, message = &quot;Review count cannot be negative&quot;)
+    private Integer reviewCount;
+
+    @Column(name = &quot;calories_per_serving&quot;)
+    @Min(value = 0, message = &quot;Calories cannot be negative&quot;)
+    @Max(value = 5000, message = &quot;Calories per serving seems unrealistic&quot;)
+    private Integer caloriesPerServing;
+
+    @CreationTimestamp
+    @Column(name = &quot;created_at&quot;, nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = &quot;updated_at&quot;, nullable = false)
+    private LocalDateTime updatedAt;
+
+<span class="fc" id="L110">    public Recipe() {}</span>
+
+<span class="nc" id="L112">    public Recipe(String name, String cuisine, String difficulty) {</span>
+<span class="nc" id="L113">        this.name = name;</span>
+<span class="nc" id="L114">        this.cuisine = cuisine;</span>
+<span class="nc" id="L115">        this.difficulty = difficulty;</span>
+<span class="nc" id="L116">    }</span>
+
+    public Long getId() {
+<span class="fc" id="L119">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L123">        this.id = id;</span>
+<span class="fc" id="L124">    }</span>
+
+    public String getName() {
+<span class="fc" id="L127">        return name;</span>
+    }
+
+    public void setName(String name) {
+<span class="fc" id="L131">        this.name = name;</span>
+<span class="fc" id="L132">    }</span>
+
+    public String getCuisine() {
+<span class="fc" id="L135">        return cuisine;</span>
+    }
+
+    public void setCuisine(String cuisine) {
+<span class="fc" id="L139">        this.cuisine = cuisine;</span>
+<span class="fc" id="L140">    }</span>
+
+    public String getDifficulty() {
+<span class="fc" id="L143">        return difficulty;</span>
+    }
+
+    public void setDifficulty(String difficulty) {
+<span class="fc" id="L147">        this.difficulty = difficulty;</span>
+<span class="fc" id="L148">    }</span>
+
+    public Integer getPrepTimeMinutes() {
+<span class="fc" id="L151">        return prepTimeMinutes;</span>
+    }
+
+    public void setPrepTimeMinutes(Integer prepTimeMinutes) {
+<span class="fc" id="L155">        this.prepTimeMinutes = prepTimeMinutes;</span>
+<span class="fc" id="L156">    }</span>
+
+    public Integer getCookTimeMinutes() {
+<span class="fc" id="L159">        return cookTimeMinutes;</span>
+    }
+
+    public void setCookTimeMinutes(Integer cookTimeMinutes) {
+<span class="fc" id="L163">        this.cookTimeMinutes = cookTimeMinutes;</span>
+<span class="fc" id="L164">    }</span>
+
+    public Integer getServings() {
+<span class="fc" id="L167">        return servings;</span>
+    }
+
+    public void setServings(Integer servings) {
+<span class="fc" id="L171">        this.servings = servings;</span>
+<span class="fc" id="L172">    }</span>
+
+    public List&lt;String&gt; getIngredients() {
+<span class="fc" id="L175">        return ingredients;</span>
+    }
+
+    public void setIngredients(List&lt;String&gt; ingredients) {
+<span class="fc bfc" id="L179" title="All 2 branches covered.">        this.ingredients = ingredients != null ? ingredients : new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L180">    }</span>
+
+    public List&lt;String&gt; getInstructions() {
+<span class="fc" id="L183">        return instructions;</span>
+    }
+
+    public void setInstructions(List&lt;String&gt; instructions) {
+<span class="fc bfc" id="L187" title="All 2 branches covered.">        this.instructions = instructions != null ? instructions : new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L188">    }</span>
+
+    public List&lt;String&gt; getTags() {
+<span class="fc" id="L191">        return tags;</span>
+    }
+
+    public void setTags(List&lt;String&gt; tags) {
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">        this.tags = tags != null ? tags : new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L196">    }</span>
+
+    public String getImage() {
+<span class="fc" id="L199">        return image;</span>
+    }
+
+    public void setImage(String image) {
+<span class="fc" id="L203">        this.image = image;</span>
+<span class="fc" id="L204">    }</span>
+
+    public Double getRating() {
+<span class="fc" id="L207">        return rating;</span>
+    }
+
+    public void setRating(Double rating) {
+<span class="fc" id="L211">        this.rating = rating;</span>
+<span class="fc" id="L212">    }</span>
+
+    public Integer getReviewCount() {
+<span class="fc" id="L215">        return reviewCount;</span>
+    }
+
+    public void setReviewCount(Integer reviewCount) {
+<span class="fc" id="L219">        this.reviewCount = reviewCount;</span>
+<span class="fc" id="L220">    }</span>
+
+    public Integer getCaloriesPerServing() {
+<span class="fc" id="L223">        return caloriesPerServing;</span>
+    }
+
+    public void setCaloriesPerServing(Integer caloriesPerServing) {
+<span class="fc" id="L227">        this.caloriesPerServing = caloriesPerServing;</span>
+<span class="fc" id="L228">    }</span>
+
+    public LocalDateTime getCreatedAt() {
+<span class="fc" id="L231">        return createdAt;</span>
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+<span class="fc" id="L235">        this.createdAt = createdAt;</span>
+<span class="fc" id="L236">    }</span>
+
+    public LocalDateTime getUpdatedAt() {
+<span class="fc" id="L239">        return updatedAt;</span>
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+<span class="fc" id="L243">        this.updatedAt = updatedAt;</span>
+<span class="fc" id="L244">    }</span>
+
+    public void addIngredient(String ingredient) {
+<span class="nc bnc" id="L247" title="All 4 branches missed.">        if (ingredient != null &amp;&amp; !ingredient.trim().isEmpty()) {</span>
+<span class="nc" id="L248">            this.ingredients.add(ingredient.trim());</span>
+        }
+<span class="nc" id="L250">    }</span>
+
+    public void addInstruction(String instruction) {
+<span class="nc bnc" id="L253" title="All 4 branches missed.">        if (instruction != null &amp;&amp; !instruction.trim().isEmpty()) {</span>
+<span class="nc" id="L254">            this.instructions.add(instruction.trim());</span>
+        }
+<span class="nc" id="L256">    }</span>
+
+    public void addTag(String tag) {
+<span class="nc bnc" id="L259" title="All 6 branches missed.">        if (tag != null &amp;&amp; !tag.trim().isEmpty() &amp;&amp; !this.tags.contains(tag.trim())) {</span>
+<span class="nc" id="L260">            this.tags.add(tag.trim());</span>
+        }
+<span class="nc" id="L262">    }</span>
+
+    public Integer getTotalTimeMinutes() {
+<span class="pc bpc" id="L265" title="1 of 2 branches missed.">        int prep = prepTimeMinutes != null ? prepTimeMinutes : 0;</span>
+<span class="pc bpc" id="L266" title="1 of 2 branches missed.">        int cook = cookTimeMinutes != null ? cookTimeMinutes : 0;</span>
+<span class="fc" id="L267">        return prep + cook;</span>
+    }
+
+    @Override
+    public boolean equals(Object o) {
+<span class="pc bpc" id="L272" title="1 of 2 branches missed.">        if (this == o) return true;</span>
+<span class="nc bnc" id="L273" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) return false;</span>
+<span class="nc" id="L274">        Recipe recipe = (Recipe) o;</span>
+<span class="nc bnc" id="L275" title="All 2 branches missed.">        return Objects.equals(id, recipe.id) &amp;&amp;</span>
+<span class="nc bnc" id="L276" title="All 2 branches missed.">               Objects.equals(name, recipe.name) &amp;&amp;</span>
+<span class="nc bnc" id="L277" title="All 2 branches missed.">               Objects.equals(cuisine, recipe.cuisine);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L282">        return Objects.hash(id, name, cuisine);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L287">        return &quot;Recipe{&quot; +</span>
+                &quot;id=&quot; + id +
+                &quot;, name='&quot; + name + '\'' +
+                &quot;, cuisine='&quot; + cuisine + '\'' +
+                &quot;, difficulty='&quot; + difficulty + '\'' +
+                &quot;, prepTimeMinutes=&quot; + prepTimeMinutes +
+                &quot;, cookTimeMinutes=&quot; + cookTimeMinutes +
+                &quot;, servings=&quot; + servings +
+                &quot;, rating=&quot; + rating +
+                &quot;, reviewCount=&quot; + reviewCount +
+                &quot;, caloriesPerServing=&quot; + caloriesPerServing +
+                '}';
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

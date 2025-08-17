@@ -1,0 +1,6 @@
+com\publicis\recipes\controller\RecipeControllerTest.class
+com\publicis\recipes\controller\RootControllerTest.class
+com\publicis\recipes\dto\RecipeMapperTest.class
+com\publicis\recipes\repository\RecipeRepositoryTest.class
+com\publicis\recipes\service\RecipeServiceTest.class
+com\publicis\recipes\service\DataLoadingServiceTest.class

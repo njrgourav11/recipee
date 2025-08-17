@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExternalRecipeService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Recipe Management Backend</a> &gt; <a href="index.source.html" class="el_package">com.publicis.recipes.external</a> &gt; <span class="el_source">ExternalRecipeService.java</span></div><h1>ExternalRecipeService.java</h1><pre class="source lang-java linenums">package com.publicis.recipes.external;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.publicis.recipes.entity.Recipe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class ExternalRecipeService {
+
+<span class="fc" id="L23">    private static final Logger logger = LoggerFactory.getLogger(ExternalRecipeService.class);</span>
+
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
+
+    @Value(&quot;${external.api.recipes.url}&quot;)
+    private String recipesApiUrl;
+
+<span class="fc" id="L31">    public ExternalRecipeService(RestTemplate restTemplate, ObjectMapper objectMapper) {</span>
+<span class="fc" id="L32">        this.restTemplate = restTemplate;</span>
+<span class="fc" id="L33">        this.objectMapper = objectMapper;</span>
+<span class="fc" id="L34">    }</span>
+
+    @Retryable(
+        retryFor = {ResourceAccessException.class, HttpServerErrorException.class},
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000, multiplier = 2.0)
+    )
+    public List&lt;Recipe&gt; fetchAllRecipes() {
+<span class="fc" id="L42">        logger.info(&quot;Fetching recipes from external API: {}&quot;, recipesApiUrl);</span>
+        
+        try {
+<span class="fc" id="L45">            String response = restTemplate.getForObject(recipesApiUrl, String.class);</span>
+            
+<span class="pc bpc" id="L47" title="2 of 4 branches missed.">            if (response == null || response.trim().isEmpty()) {</span>
+<span class="nc" id="L48">                logger.warn(&quot;Received empty response from external API&quot;);</span>
+<span class="nc" id="L49">                return new ArrayList&lt;&gt;();</span>
+            }
+
+<span class="fc" id="L52">            logger.debug(&quot;Received response from external API, length: {} characters&quot;, response.length());</span>
+            
+<span class="fc" id="L54">            JsonNode rootNode = objectMapper.readTree(response);</span>
+<span class="fc" id="L55">            JsonNode recipesNode = rootNode.get(&quot;recipes&quot;);</span>
+            
+<span class="pc bpc" id="L57" title="2 of 4 branches missed.">            if (recipesNode == null || !recipesNode.isArray()) {</span>
+<span class="nc" id="L58">                logger.warn(&quot;Invalid response format: 'recipes' array not found&quot;);</span>
+<span class="nc" id="L59">                return new ArrayList&lt;&gt;();</span>
+            }
+
+<span class="fc" id="L62">            List&lt;Recipe&gt; recipes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L63">            int processedCount = 0;</span>
+<span class="fc" id="L64">            int skippedCount = 0;</span>
+
+<span class="fc bfc" id="L66" title="All 2 branches covered.">            for (JsonNode recipeNode : recipesNode) {</span>
+                try {
+<span class="fc" id="L68">                    Recipe recipe = mapJsonToRecipe(recipeNode);</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">                    if (recipe != null) {</span>
+<span class="fc" id="L70">                        recipes.add(recipe);</span>
+<span class="fc" id="L71">                        processedCount++;</span>
+                    } else {
+<span class="nc" id="L73">                        skippedCount++;</span>
+                    }
+<span class="nc" id="L75">                } catch (Exception e) {</span>
+<span class="nc" id="L76">                    logger.warn(&quot;Failed to parse recipe from JSON: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L77">                    skippedCount++;</span>
+<span class="fc" id="L78">                }</span>
+<span class="fc" id="L79">            }</span>
+
+<span class="fc" id="L81">            logger.info(&quot;Successfully processed {} recipes, skipped {} invalid recipes&quot;,</span>
+<span class="fc" id="L82">                       processedCount, skippedCount);</span>
+            
+<span class="fc" id="L84">            return recipes;</span>
+
+<span class="nc" id="L86">        } catch (HttpClientErrorException e) {</span>
+<span class="nc" id="L87">            logger.error(&quot;Client error while fetching recipes: {} - {}&quot;, e.getStatusCode(), e.getMessage());</span>
+<span class="nc" id="L88">            throw new ExternalApiException(&quot;Client error from external API: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L89">        } catch (HttpServerErrorException e) {</span>
+<span class="nc" id="L90">            logger.error(&quot;Server error while fetching recipes: {} - {}&quot;, e.getStatusCode(), e.getMessage());</span>
+<span class="nc" id="L91">            throw new ExternalApiException(&quot;Server error from external API: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L92">        } catch (ResourceAccessException e) {</span>
+<span class="nc" id="L93">            logger.error(&quot;Network error while fetching recipes: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L94">            throw new ExternalApiException(&quot;Network error accessing external API: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L95">        } catch (Exception e) {</span>
+<span class="nc" id="L96">            logger.error(&quot;Unexpected error while fetching recipes&quot;, e);</span>
+<span class="nc" id="L97">            throw new ExternalApiException(&quot;Unexpected error fetching recipes: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    private Recipe mapJsonToRecipe(JsonNode recipeNode) {
+        try {
+<span class="fc" id="L103">            Recipe recipe = new Recipe();</span>
+
+<span class="fc" id="L105">            String name = getTextValue(recipeNode, &quot;name&quot;);</span>
+<span class="fc" id="L106">            String cuisine = getTextValue(recipeNode, &quot;cuisine&quot;);</span>
+            
+<span class="pc bpc" id="L108" title="4 of 8 branches missed.">            if (name == null || name.trim().isEmpty() || cuisine == null || cuisine.trim().isEmpty()) {</span>
+<span class="nc" id="L109">                logger.debug(&quot;Skipping recipe with missing required fields: name={}, cuisine={}&quot;, name, cuisine);</span>
+<span class="nc" id="L110">                return null;</span>
+            }
+
+<span class="fc" id="L113">            recipe.setName(name.trim());</span>
+<span class="fc" id="L114">            recipe.setCuisine(cuisine.trim());</span>
+
+<span class="fc" id="L116">            recipe.setDifficulty(getTextValue(recipeNode, &quot;difficulty&quot;, &quot;Medium&quot;));</span>
+<span class="fc" id="L117">            recipe.setPrepTimeMinutes(getIntValue(recipeNode, &quot;prepTimeMinutes&quot;));</span>
+<span class="fc" id="L118">            recipe.setCookTimeMinutes(getIntValue(recipeNode, &quot;cookTimeMinutes&quot;));</span>
+<span class="fc" id="L119">            recipe.setServings(getIntValue(recipeNode, &quot;servings&quot;));</span>
+<span class="fc" id="L120">            recipe.setCaloriesPerServing(getIntValue(recipeNode, &quot;caloriesPerServing&quot;));</span>
+<span class="fc" id="L121">            recipe.setRating(getDoubleValue(recipeNode, &quot;rating&quot;));</span>
+<span class="fc" id="L122">            recipe.setReviewCount(getIntValue(recipeNode, &quot;reviewCount&quot;));</span>
+<span class="fc" id="L123">            recipe.setImage(getTextValue(recipeNode, &quot;image&quot;));</span>
+
+<span class="fc" id="L125">            recipe.setIngredients(getStringList(recipeNode, &quot;ingredients&quot;));</span>
+<span class="fc" id="L126">            recipe.setInstructions(getStringList(recipeNode, &quot;instructions&quot;));</span>
+<span class="fc" id="L127">            recipe.setTags(getStringList(recipeNode, &quot;tags&quot;));</span>
+
+<span class="fc" id="L129">            logger.debug(&quot;Successfully mapped recipe: {}&quot;, recipe.getName());</span>
+<span class="fc" id="L130">            return recipe;</span>
+
+<span class="nc" id="L132">        } catch (Exception e) {</span>
+<span class="nc" id="L133">            logger.warn(&quot;Failed to map JSON to Recipe: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L134">            return null;</span>
+        }
+    }
+
+    private String getTextValue(JsonNode node, String fieldName) {
+<span class="fc" id="L139">        return getTextValue(node, fieldName, null);</span>
+    }
+
+    private String getTextValue(JsonNode node, String fieldName, String defaultValue) {
+<span class="fc" id="L143">        JsonNode fieldNode = node.get(fieldName);</span>
+<span class="pc bpc" id="L144" title="3 of 6 branches missed.">        if (fieldNode != null &amp;&amp; !fieldNode.isNull() &amp;&amp; fieldNode.isTextual()) {</span>
+<span class="fc" id="L145">            String value = fieldNode.asText().trim();</span>
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">            return value.isEmpty() ? defaultValue : value;</span>
+        }
+<span class="nc" id="L148">        return defaultValue;</span>
+    }
+
+    private Integer getIntValue(JsonNode node, String fieldName) {
+<span class="fc" id="L152">        JsonNode fieldNode = node.get(fieldName);</span>
+<span class="pc bpc" id="L153" title="3 of 6 branches missed.">        if (fieldNode != null &amp;&amp; !fieldNode.isNull() &amp;&amp; fieldNode.isNumber()) {</span>
+<span class="fc" id="L154">            return fieldNode.asInt();</span>
+        }
+<span class="nc" id="L156">        return null;</span>
+    }
+
+    private Double getDoubleValue(JsonNode node, String fieldName) {
+<span class="fc" id="L160">        JsonNode fieldNode = node.get(fieldName);</span>
+<span class="pc bpc" id="L161" title="3 of 6 branches missed.">        if (fieldNode != null &amp;&amp; !fieldNode.isNull() &amp;&amp; fieldNode.isNumber()) {</span>
+<span class="fc" id="L162">            return fieldNode.asDouble();</span>
+        }
+<span class="nc" id="L164">        return null;</span>
+    }
+
+    private List&lt;String&gt; getStringList(JsonNode node, String fieldName) {
+<span class="fc" id="L168">        List&lt;String&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L169">        JsonNode arrayNode = node.get(fieldName);</span>
+        
+<span class="pc bpc" id="L171" title="2 of 4 branches missed.">        if (arrayNode != null &amp;&amp; arrayNode.isArray()) {</span>
+<span class="fc bfc" id="L172" title="All 2 branches covered.">            for (JsonNode item : arrayNode) {</span>
+<span class="pc bpc" id="L173" title="1 of 2 branches missed.">                if (item.isTextual()) {</span>
+<span class="fc" id="L174">                    String value = item.asText().trim();</span>
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">                    if (!value.isEmpty()) {</span>
+<span class="fc" id="L176">                        result.add(value);</span>
+                    }
+                }
+<span class="fc" id="L179">            }</span>
+        }
+        
+<span class="fc" id="L182">        return result;</span>
+    }
+
+    public boolean isApiAccessible() {
+        try {
+<span class="fc" id="L187">            logger.debug(&quot;Checking API accessibility: {}&quot;, recipesApiUrl);</span>
+<span class="fc" id="L188">            restTemplate.headForHeaders(recipesApiUrl);</span>
+<span class="fc" id="L189">            logger.debug(&quot;API is accessible&quot;);</span>
+<span class="fc" id="L190">            return true;</span>
+<span class="nc" id="L191">        } catch (Exception e) {</span>
+<span class="nc" id="L192">            logger.warn(&quot;API is not accessible: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L193">            return false;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

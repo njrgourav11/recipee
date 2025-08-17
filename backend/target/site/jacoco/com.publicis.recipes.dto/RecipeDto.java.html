@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RecipeDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Recipe Management Backend</a> &gt; <a href="index.source.html" class="el_package">com.publicis.recipes.dto</a> &gt; <span class="el_source">RecipeDto.java</span></div><h1>RecipeDto.java</h1><pre class="source lang-java linenums">package com.publicis.recipes.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Schema(description = &quot;Recipe information&quot;)
+public class RecipeDto {
+
+    @Schema(description = &quot;Unique identifier of the recipe&quot;, example = &quot;1&quot;)
+    private Long id;
+
+    @Schema(description = &quot;Name of the recipe&quot;, example = &quot;Classic Margherita Pizza&quot;, required = true)
+    @NotBlank(message = &quot;Recipe name is required&quot;)
+    @Size(min = 2, max = 255, message = &quot;Recipe name must be between 2 and 255 characters&quot;)
+    private String name;
+
+    @Schema(description = &quot;Cuisine type&quot;, example = &quot;Italian&quot;, required = true)
+    @NotBlank(message = &quot;Cuisine is required&quot;)
+    @Size(min = 2, max = 100, message = &quot;Cuisine must be between 2 and 100 characters&quot;)
+    private String cuisine;
+
+    @Schema(description = &quot;Difficulty level&quot;, example = &quot;Easy&quot;, allowableValues = {&quot;Easy&quot;, &quot;Medium&quot;, &quot;Hard&quot;}, required = true)
+    @NotBlank(message = &quot;Difficulty level is required&quot;)
+    @Pattern(regexp = &quot;Easy|Medium|Hard&quot;, message = &quot;Difficulty must be Easy, Medium, or Hard&quot;)
+    private String difficulty;
+
+    @Schema(description = &quot;Preparation time in minutes&quot;, example = &quot;20&quot;)
+    @JsonProperty(&quot;prep_time_minutes&quot;)
+    @Min(value = 0, message = &quot;Preparation time cannot be negative&quot;)
+    @Max(value = 1440, message = &quot;Preparation time cannot exceed 24 hours&quot;)
+    private Integer prepTimeMinutes;
+
+    @Schema(description = &quot;Cooking time in minutes&quot;, example = &quot;15&quot;)
+    @JsonProperty(&quot;cook_time_minutes&quot;)
+    @Min(value = 0, message = &quot;Cook time cannot be negative&quot;)
+    @Max(value = 1440, message = &quot;Cook time cannot exceed 24 hours&quot;)
+    private Integer cookTimeMinutes;
+
+    @Schema(description = &quot;Number of servings&quot;, example = &quot;4&quot;)
+    @Min(value = 1, message = &quot;Servings must be at least 1&quot;)
+    @Max(value = 50, message = &quot;Servings cannot exceed 50&quot;)
+    private Integer servings;
+
+    @Schema(description = &quot;List of ingredients&quot;, example = &quot;[\&quot;Pizza dough\&quot;, \&quot;Tomato sauce\&quot;, \&quot;Mozzarella cheese\&quot;]&quot;)
+    @Size(min = 1, message = &quot;Recipe must have at least one ingredient&quot;)
+    private List&lt;String&gt; ingredients;
+
+    @Schema(description = &quot;Cooking instructions&quot;, example = &quot;[\&quot;Preheat oven to 475°F\&quot;, \&quot;Roll out dough\&quot;, \&quot;Add toppings\&quot;]&quot;)
+    @Size(min = 1, message = &quot;Recipe must have at least one instruction&quot;)
+    private List&lt;String&gt; instructions;
+
+    @Schema(description = &quot;Recipe tags&quot;, example = &quot;[\&quot;Pizza\&quot;, \&quot;Italian\&quot;, \&quot;Vegetarian\&quot;]&quot;)
+    private List&lt;String&gt; tags;
+
+    @Schema(description = &quot;Recipe image URL&quot;, example = &quot;https://example.com/pizza.jpg&quot;)
+    @Pattern(regexp = &quot;^(https?://.*\\.(jpg|jpeg|png|gif|webp))?$&quot;, 
+             message = &quot;Image must be a valid URL ending with jpg, jpeg, png, gif, or webp&quot;)
+    private String image;
+
+    @Schema(description = &quot;Average rating&quot;, example = &quot;4.5&quot;)
+    @DecimalMin(value = &quot;0.0&quot;, message = &quot;Rating cannot be negative&quot;)
+    @DecimalMax(value = &quot;5.0&quot;, message = &quot;Rating cannot exceed 5.0&quot;)
+    private Double rating;
+
+    @Schema(description = &quot;Number of reviews&quot;, example = &quot;120&quot;)
+    @JsonProperty(&quot;review_count&quot;)
+    @Min(value = 0, message = &quot;Review count cannot be negative&quot;)
+    private Integer reviewCount;
+
+    @Schema(description = &quot;Calories per serving&quot;, example = &quot;285&quot;)
+    @JsonProperty(&quot;calories_per_serving&quot;)
+    @Min(value = 0, message = &quot;Calories cannot be negative&quot;)
+    @Max(value = 5000, message = &quot;Calories per serving seems unrealistic&quot;)
+    private Integer caloriesPerServing;
+
+    @Schema(description = &quot;Total cooking time in minutes&quot;, example = &quot;35&quot;)
+    @JsonProperty(&quot;total_time_minutes&quot;)
+    private Integer totalTimeMinutes;
+
+    @Schema(description = &quot;Creation timestamp&quot;, example = &quot;2024-01-15T10:30:00&quot;)
+    @JsonProperty(&quot;created_at&quot;)
+    private LocalDateTime createdAt;
+
+    @Schema(description = &quot;Last update timestamp&quot;, example = &quot;2024-01-15T10:30:00&quot;)
+    @JsonProperty(&quot;updated_at&quot;)
+    private LocalDateTime updatedAt;
+
+<span class="fc" id="L92">    public RecipeDto() {}</span>
+
+<span class="nc" id="L94">    public RecipeDto(String name, String cuisine, String difficulty) {</span>
+<span class="nc" id="L95">        this.name = name;</span>
+<span class="nc" id="L96">        this.cuisine = cuisine;</span>
+<span class="nc" id="L97">        this.difficulty = difficulty;</span>
+<span class="nc" id="L98">    }</span>
+
+    public Long getId() {
+<span class="fc" id="L101">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L105">        this.id = id;</span>
+<span class="fc" id="L106">    }</span>
+
+    public String getName() {
+<span class="fc" id="L109">        return name;</span>
+    }
+
+    public void setName(String name) {
+<span class="fc" id="L113">        this.name = name;</span>
+<span class="fc" id="L114">    }</span>
+
+    public String getCuisine() {
+<span class="fc" id="L117">        return cuisine;</span>
+    }
+
+    public void setCuisine(String cuisine) {
+<span class="fc" id="L121">        this.cuisine = cuisine;</span>
+<span class="fc" id="L122">    }</span>
+
+    public String getDifficulty() {
+<span class="fc" id="L125">        return difficulty;</span>
+    }
+
+    public void setDifficulty(String difficulty) {
+<span class="fc" id="L129">        this.difficulty = difficulty;</span>
+<span class="fc" id="L130">    }</span>
+
+    public Integer getPrepTimeMinutes() {
+<span class="fc" id="L133">        return prepTimeMinutes;</span>
+    }
+
+    public void setPrepTimeMinutes(Integer prepTimeMinutes) {
+<span class="fc" id="L137">        this.prepTimeMinutes = prepTimeMinutes;</span>
+<span class="fc" id="L138">    }</span>
+
+    public Integer getCookTimeMinutes() {
+<span class="fc" id="L141">        return cookTimeMinutes;</span>
+    }
+
+    public void setCookTimeMinutes(Integer cookTimeMinutes) {
+<span class="fc" id="L145">        this.cookTimeMinutes = cookTimeMinutes;</span>
+<span class="fc" id="L146">    }</span>
+
+    public Integer getServings() {
+<span class="fc" id="L149">        return servings;</span>
+    }
+
+    public void setServings(Integer servings) {
+<span class="fc" id="L153">        this.servings = servings;</span>
+<span class="fc" id="L154">    }</span>
+
+    public List&lt;String&gt; getIngredients() {
+<span class="fc" id="L157">        return ingredients;</span>
+    }
+
+    public void setIngredients(List&lt;String&gt; ingredients) {
+<span class="fc" id="L161">        this.ingredients = ingredients;</span>
+<span class="fc" id="L162">    }</span>
+
+    public List&lt;String&gt; getInstructions() {
+<span class="fc" id="L165">        return instructions;</span>
+    }
+
+    public void setInstructions(List&lt;String&gt; instructions) {
+<span class="fc" id="L169">        this.instructions = instructions;</span>
+<span class="fc" id="L170">    }</span>
+
+    public List&lt;String&gt; getTags() {
+<span class="fc" id="L173">        return tags;</span>
+    }
+
+    public void setTags(List&lt;String&gt; tags) {
+<span class="fc" id="L177">        this.tags = tags;</span>
+<span class="fc" id="L178">    }</span>
+
+    public String getImage() {
+<span class="fc" id="L181">        return image;</span>
+    }
+
+    public void setImage(String image) {
+<span class="fc" id="L185">        this.image = image;</span>
+<span class="fc" id="L186">    }</span>
+
+    public Double getRating() {
+<span class="fc" id="L189">        return rating;</span>
+    }
+
+    public void setRating(Double rating) {
+<span class="fc" id="L193">        this.rating = rating;</span>
+<span class="fc" id="L194">    }</span>
+
+    public Integer getReviewCount() {
+<span class="fc" id="L197">        return reviewCount;</span>
+    }
+
+    public void setReviewCount(Integer reviewCount) {
+<span class="fc" id="L201">        this.reviewCount = reviewCount;</span>
+<span class="fc" id="L202">    }</span>
+
+    public Integer getCaloriesPerServing() {
+<span class="fc" id="L205">        return caloriesPerServing;</span>
+    }
+
+    public void setCaloriesPerServing(Integer caloriesPerServing) {
+<span class="fc" id="L209">        this.caloriesPerServing = caloriesPerServing;</span>
+<span class="fc" id="L210">    }</span>
+
+    public Integer getTotalTimeMinutes() {
+<span class="fc" id="L213">        return totalTimeMinutes;</span>
+    }
+
+    public void setTotalTimeMinutes(Integer totalTimeMinutes) {
+<span class="fc" id="L217">        this.totalTimeMinutes = totalTimeMinutes;</span>
+<span class="fc" id="L218">    }</span>
+
+    public LocalDateTime getCreatedAt() {
+<span class="fc" id="L221">        return createdAt;</span>
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+<span class="fc" id="L225">        this.createdAt = createdAt;</span>
+<span class="fc" id="L226">    }</span>
+
+    public LocalDateTime getUpdatedAt() {
+<span class="fc" id="L229">        return updatedAt;</span>
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+<span class="fc" id="L233">        this.updatedAt = updatedAt;</span>
+<span class="fc" id="L234">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

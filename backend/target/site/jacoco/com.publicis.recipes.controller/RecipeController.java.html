@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RecipeController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Recipe Management Backend</a> &gt; <a href="index.source.html" class="el_package">com.publicis.recipes.controller</a> &gt; <span class="el_source">RecipeController.java</span></div><h1>RecipeController.java</h1><pre class="source lang-java linenums">package com.publicis.recipes.controller;
+
+import com.publicis.recipes.dto.RecipeDto;
+import com.publicis.recipes.service.DataLoadingService;
+import com.publicis.recipes.service.RecipeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
+/**
+ * REST Controller for Recipe operations.
+ * 
+ * This controller provides RESTful endpoints for:
+ * - Searching recipes with full-text search
+ * - Retrieving individual recipes by ID
+ * - Loading data from external APIs
+ * - Getting recipe statistics and suggestions
+ * 
+ * @author Recipe Management Team
+ * @version 1.0.0
+ */
+@RestController
+@RequestMapping(&quot;/api/recipes&quot;)
+@Validated
+@Tag(name = &quot;Recipe Management&quot;, description = &quot;APIs for recipe search and management&quot;)
+public class RecipeController {
+
+<span class="fc" id="L48">    private static final Logger logger = LoggerFactory.getLogger(RecipeController.class);</span>
+
+    private final RecipeService recipeService;
+    private final DataLoadingService dataLoadingService;
+
+<span class="fc" id="L53">    public RecipeController(RecipeService recipeService, DataLoadingService dataLoadingService) {</span>
+<span class="fc" id="L54">        this.recipeService = recipeService;</span>
+<span class="fc" id="L55">        this.dataLoadingService = dataLoadingService;</span>
+<span class="fc" id="L56">    }</span>
+
+    /**
+     * Searches recipes based on query parameters.
+     */
+    @GetMapping(&quot;/search&quot;)
+    @Operation(
+        summary = &quot;Search recipes&quot;,
+        description = &quot;Search recipes by name and cuisine using full-text search. Requires at least 3 characters for optimal results.&quot;
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Search completed successfully&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;, 
+                                     schema = @Schema(implementation = Page.class))),
+        @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid search parameters&quot;),
+        @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
+    })
+    public ResponseEntity&lt;Page&lt;RecipeDto&gt;&gt; searchRecipes(
+            @Parameter(description = &quot;Search query for recipe name and cuisine&quot;, example = &quot;pizza&quot;)
+            @RequestParam(required = false) String q,
+            
+            @Parameter(description = &quot;Page number (0-based)&quot;, example = &quot;0&quot;)
+            @RequestParam(defaultValue = &quot;0&quot;) @Min(0) int page,
+            
+            @Parameter(description = &quot;Page size&quot;, example = &quot;20&quot;)
+            @RequestParam(defaultValue = &quot;20&quot;) @Min(1) @Max(100) int size,
+            
+            @Parameter(description = &quot;Sort field&quot;, example = &quot;name&quot;)
+            @RequestParam(defaultValue = &quot;name&quot;) String sort,
+            
+            @Parameter(description = &quot;Sort direction&quot;, example = &quot;asc&quot;)
+            @RequestParam(defaultValue = &quot;asc&quot;) String direction) {
+
+<span class="fc" id="L89">        logger.info(&quot;Search request - query: '{}', page: {}, size: {}, sort: {} {}&quot;, </span>
+<span class="fc" id="L90">                   q, page, size, sort, direction);</span>
+
+        try {
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">            Sort.Direction sortDirection = &quot;desc&quot;.equalsIgnoreCase(direction) </span>
+<span class="nc" id="L94">                ? Sort.Direction.DESC </span>
+<span class="fc" id="L95">                : Sort.Direction.ASC;</span>
+            
+<span class="fc" id="L97">            Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));</span>
+<span class="fc" id="L98">            Page&lt;RecipeDto&gt; recipes = recipeService.searchRecipes(q, pageable);</span>
+
+<span class="fc" id="L100">            logger.info(&quot;Search completed - found {} recipes out of {} total&quot;, </span>
+<span class="fc" id="L101">                       recipes.getNumberOfElements(), recipes.getTotalElements());</span>
+
+<span class="fc" id="L103">            return ResponseEntity.ok(recipes);</span>
+
+<span class="nc" id="L105">        } catch (Exception e) {</span>
+<span class="nc" id="L106">            logger.error(&quot;Error during recipe search&quot;, e);</span>
+<span class="nc" id="L107">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+
+    /**
+     * Gets a specific recipe by ID.
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    @Operation(
+        summary = &quot;Get recipe by ID&quot;,
+        description = &quot;Retrieve a specific recipe by its unique identifier&quot;
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Recipe found&quot;,
+                    content = @Content(mediaType = &quot;application/json&quot;, 
+                                     schema = @Schema(implementation = RecipeDto.class))),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Recipe not found&quot;),
+        @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid recipe ID&quot;),
+        @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
+    })
+    public ResponseEntity&lt;RecipeDto&gt; getRecipeById(
+            @Parameter(description = &quot;Recipe ID&quot;, example = &quot;1&quot;, required = true)
+            @PathVariable Long id) {
+
+<span class="fc" id="L131">        logger.info(&quot;Get recipe request for ID: {}&quot;, id);</span>
+
+        try {
+<span class="pc bpc" id="L134" title="1 of 4 branches missed.">            if (id == null || id &lt;= 0) {</span>
+<span class="fc" id="L135">                logger.warn(&quot;Invalid recipe ID: {}&quot;, id);</span>
+<span class="fc" id="L136">                return ResponseEntity.badRequest().build();</span>
+            }
+
+<span class="fc" id="L139">            return recipeService.findById(id)</span>
+<span class="fc" id="L140">                .map(recipe -&gt; {</span>
+<span class="fc" id="L141">                    logger.info(&quot;Recipe found: {}&quot;, recipe.getName());</span>
+<span class="fc" id="L142">                    return ResponseEntity.ok(recipe);</span>
+                })
+<span class="fc" id="L144">                .orElseGet(() -&gt; {</span>
+<span class="fc" id="L145">                    logger.info(&quot;Recipe not found with ID: {}&quot;, id);</span>
+<span class="fc" id="L146">                    return ResponseEntity.notFound().build();</span>
+                });
+
+<span class="nc" id="L149">        } catch (Exception e) {</span>
+<span class="nc" id="L150">            logger.error(&quot;Error retrieving recipe with ID: {}&quot;, id, e);</span>
+<span class="nc" id="L151">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+
+    /**
+     * Loads recipes from external API.
+     */
+    @PostMapping(&quot;/load&quot;)
+    @Operation(
+        summary = &quot;Load recipes from external API&quot;,
+        description = &quot;Asynchronously loads recipe data from external API (dummyjson.com/recipes) into the database&quot;
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;202&quot;, description = &quot;Data loading initiated&quot;),
+        @ApiResponse(responseCode = &quot;409&quot;, description = &quot;Loading already in progress&quot;),
+        @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
+    })
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; loadRecipes() {
+<span class="fc" id="L169">        logger.info(&quot;Recipe loading request received&quot;);</span>
+
+        try {
+<span class="fc bfc" id="L172" title="All 2 branches covered.">            if (dataLoadingService.isLoadingInProgress()) {</span>
+<span class="fc" id="L173">                logger.warn(&quot;Recipe loading already in progress&quot;);</span>
+<span class="fc" id="L174">                return ResponseEntity.status(409).body(Map.of(</span>
+                    &quot;message&quot;, &quot;Recipe loading is already in progress&quot;,
+<span class="fc" id="L176">                    &quot;timestamp&quot;, LocalDateTime.now()</span>
+                ));
+            }
+
+<span class="fc" id="L180">            CompletableFuture&lt;DataLoadingService.DataLoadResult&gt; future = </span>
+<span class="fc" id="L181">                dataLoadingService.loadRecipesFromExternalApi();</span>
+
+<span class="fc" id="L183">            logger.info(&quot;Recipe loading initiated asynchronously&quot;);</span>
+
+<span class="fc" id="L185">            return ResponseEntity.accepted().body(Map.of(</span>
+                &quot;message&quot;, &quot;Recipe loading initiated&quot;,
+<span class="fc" id="L187">                &quot;timestamp&quot;, LocalDateTime.now(),</span>
+                &quot;status&quot;, &quot;in_progress&quot;
+            ));
+
+<span class="nc" id="L191">        } catch (Exception e) {</span>
+<span class="nc" id="L192">            logger.error(&quot;Error initiating recipe loading&quot;, e);</span>
+<span class="nc" id="L193">            return ResponseEntity.internalServerError().body(Map.of(</span>
+                &quot;message&quot;, &quot;Failed to initiate recipe loading&quot;,
+<span class="nc" id="L195">                &quot;error&quot;, e.getMessage(),</span>
+<span class="nc" id="L196">                &quot;timestamp&quot;, LocalDateTime.now()</span>
+            ));
+        }
+    }
+
+    /**
+     * Gets the current data loading status.
+     */
+    @GetMapping(&quot;/load/status&quot;)
+    @Operation(
+        summary = &quot;Get data loading status&quot;,
+        description = &quot;Retrieve the current status of data loading operations&quot;
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Status retrieved successfully&quot;),
+        @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
+    })
+    public ResponseEntity&lt;DataLoadingService.DataLoadStatus&gt; getLoadingStatus() {
+<span class="fc" id="L214">        logger.debug(&quot;Loading status request received&quot;);</span>
+
+        try {
+<span class="fc" id="L217">            DataLoadingService.DataLoadStatus status = dataLoadingService.getLoadingStatus();</span>
+<span class="fc" id="L218">            return ResponseEntity.ok(status);</span>
+
+<span class="nc" id="L220">        } catch (Exception e) {</span>
+<span class="nc" id="L221">            logger.error(&quot;Error retrieving loading status&quot;, e);</span>
+<span class="nc" id="L222">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+
+    /**
+     * Gets search suggestions based on partial input.
+     */
+    @GetMapping(&quot;/suggestions&quot;)
+    @Operation(
+        summary = &quot;Get search suggestions&quot;,
+        description = &quot;Get search suggestions based on partial recipe name input&quot;
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Suggestions retrieved successfully&quot;),
+        @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid query parameter&quot;),
+        @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
+    })
+    public ResponseEntity&lt;List&lt;String&gt;&gt; getSearchSuggestions(
+            @Parameter(description = &quot;Partial search query&quot;, example = &quot;piz&quot;)
+            @RequestParam String q,
+            
+            @Parameter(description = &quot;Maximum number of suggestions&quot;, example = &quot;10&quot;)
+            @RequestParam(defaultValue = &quot;10&quot;) @Min(1) @Max(20) int limit) {
+
+<span class="fc" id="L246">        logger.debug(&quot;Search suggestions request - query: '{}', limit: {}&quot;, q, limit);</span>
+
+        try {
+<span class="pc bpc" id="L249" title="1 of 4 branches missed.">            if (q == null || q.trim().length() &lt; 2) {</span>
+<span class="fc" id="L250">                logger.warn(&quot;Query too short for suggestions: '{}'&quot;, q);</span>
+<span class="fc" id="L251">                return ResponseEntity.badRequest().build();</span>
+            }
+
+<span class="fc" id="L254">            List&lt;String&gt; suggestions = recipeService.getSearchSuggestions(q.trim(), limit);</span>
+            
+<span class="fc" id="L256">            logger.debug(&quot;Returning {} suggestions for query: '{}'&quot;, suggestions.size(), q);</span>
+            
+<span class="fc" id="L258">            return ResponseEntity.ok(suggestions);</span>
+
+<span class="nc" id="L260">        } catch (Exception e) {</span>
+<span class="nc" id="L261">            logger.error(&quot;Error getting search suggestions for query: '{}'&quot;, q, e);</span>
+<span class="nc" id="L262">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+
+    /**
+     * Gets recipe statistics.
+     */
+    @GetMapping(&quot;/statistics&quot;)
+    @Operation(
+        summary = &quot;Get recipe statistics&quot;,
+        description = &quot;Retrieve various statistics about recipes in the database&quot;
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Statistics retrieved successfully&quot;),
+        @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
+    })
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; getRecipeStatistics() {
+<span class="fc" id="L279">        logger.debug(&quot;Recipe statistics request received&quot;);</span>
+
+        try {
+<span class="fc" id="L282">            Map&lt;String, Object&gt; statistics = recipeService.getRecipeStatistics();</span>
+<span class="fc" id="L283">            return ResponseEntity.ok(statistics);</span>
+
+<span class="nc" id="L285">        } catch (Exception e) {</span>
+<span class="nc" id="L286">            logger.error(&quot;Error retrieving recipe statistics&quot;, e);</span>
+<span class="nc" id="L287">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+
+    /**
+     * Gets recipes by cuisine.
+     */
+    @GetMapping(&quot;/cuisine/{cuisine}&quot;)
+    @Operation(
+        summary = &quot;Get recipes by cuisine&quot;,
+        description = &quot;Retrieve recipes filtered by cuisine type&quot;
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Recipes retrieved successfully&quot;),
+        @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid cuisine parameter&quot;),
+        @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
+    })
+    public ResponseEntity&lt;Page&lt;RecipeDto&gt;&gt; getRecipesByCuisine(
+            @Parameter(description = &quot;Cuisine type&quot;, example = &quot;Italian&quot;, required = true)
+            @PathVariable String cuisine,
+            
+            @Parameter(description = &quot;Page number (0-based)&quot;, example = &quot;0&quot;)
+            @RequestParam(defaultValue = &quot;0&quot;) @Min(0) int page,
+            
+            @Parameter(description = &quot;Page size&quot;, example = &quot;20&quot;)
+            @RequestParam(defaultValue = &quot;20&quot;) @Min(1) @Max(100) int size) {
+
+<span class="fc" id="L314">        logger.info(&quot;Get recipes by cuisine request - cuisine: '{}', page: {}, size: {}&quot;, </span>
+<span class="fc" id="L315">                   cuisine, page, size);</span>
+
+        try {
+<span class="pc bpc" id="L318" title="1 of 4 branches missed.">            if (cuisine == null || cuisine.trim().isEmpty()) {</span>
+<span class="fc" id="L319">                logger.warn(&quot;Empty cuisine parameter&quot;);</span>
+<span class="fc" id="L320">                return ResponseEntity.badRequest().build();</span>
+            }
+
+<span class="fc" id="L323">            Pageable pageable = PageRequest.of(page, size, Sort.by(&quot;name&quot;));</span>
+<span class="fc" id="L324">            Page&lt;RecipeDto&gt; recipes = recipeService.findByCuisine(cuisine, pageable);</span>
+
+<span class="fc" id="L326">            logger.info(&quot;Found {} recipes for cuisine: '{}'&quot;, recipes.getTotalElements(), cuisine);</span>
+
+<span class="fc" id="L328">            return ResponseEntity.ok(recipes);</span>
+
+<span class="nc" id="L330">        } catch (Exception e) {</span>
+<span class="nc" id="L331">            logger.error(&quot;Error retrieving recipes by cuisine: '{}'&quot;, cuisine, e);</span>
+<span class="nc" id="L332">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+
+    /**
+     * Gets top-rated recipes.
+     */
+    @GetMapping(&quot;/top-rated&quot;)
+    @Operation(
+        summary = &quot;Get top-rated recipes&quot;,
+        description = &quot;Retrieve recipes sorted by rating in descending order&quot;
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Top-rated recipes retrieved successfully&quot;),
+        @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;)
+    })
+    public ResponseEntity&lt;Page&lt;RecipeDto&gt;&gt; getTopRatedRecipes(
+            @Parameter(description = &quot;Page number (0-based)&quot;, example = &quot;0&quot;)
+            @RequestParam(defaultValue = &quot;0&quot;) @Min(0) int page,
+            
+            @Parameter(description = &quot;Page size&quot;, example = &quot;20&quot;)
+            @RequestParam(defaultValue = &quot;20&quot;) @Min(1) @Max(100) int size) {
+
+<span class="fc" id="L355">        logger.info(&quot;Get top-rated recipes request - page: {}, size: {}&quot;, page, size);</span>
+
+        try {
+<span class="fc" id="L358">            Pageable pageable = PageRequest.of(page, size);</span>
+<span class="fc" id="L359">            Page&lt;RecipeDto&gt; recipes = recipeService.getTopRatedRecipes(pageable);</span>
+
+<span class="fc" id="L361">            logger.info(&quot;Retrieved {} top-rated recipes&quot;, recipes.getNumberOfElements());</span>
+
+<span class="fc" id="L363">            return ResponseEntity.ok(recipes);</span>
+
+<span class="nc" id="L365">        } catch (Exception e) {</span>
+<span class="nc" id="L366">            logger.error(&quot;Error retrieving top-rated recipes&quot;, e);</span>
+<span class="nc" id="L367">            return ResponseEntity.internalServerError().build();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

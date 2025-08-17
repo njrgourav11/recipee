@@ -11,26 +11,12 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-/**
- * OpenAPI configuration for Swagger documentation.
- * 
- * This class configures the OpenAPI specification for the Recipe Management System,
- * providing comprehensive API documentation with interactive UI.
- * 
- * @author Recipe Management Team
- * @version 1.0.0
- */
 @Configuration
 public class OpenApiConfig {
 
     @Value("${server.port:8080}")
     private String serverPort;
 
-    /**
-     * Creates the OpenAPI configuration bean.
-     * 
-     * @return configured OpenAPI instance
-     */
     @Bean
     public OpenAPI recipeManagementOpenAPI() {
         Server localServer = new Server()

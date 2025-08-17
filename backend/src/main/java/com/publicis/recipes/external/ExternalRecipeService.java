@@ -17,18 +17,6 @@ import org.springframework.web.client.HttpServerErrorException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Service for fetching recipe data from external API (dummyjson.com).
- * 
- * This service implements resilience patterns including:
- * - Retry mechanism with exponential backoff
- * - Comprehensive error handling
- * - Request/response logging
- * - Data transformation and validation
- * 
- * @author Recipe Management Team
- * @version 1.0.0
- */
 @Service
 public class ExternalRecipeService {
 
@@ -45,12 +33,6 @@ public class ExternalRecipeService {
         this.objectMapper = objectMapper;
     }
 
-    /**
-     * Fetches all recipes from the external API with retry mechanism.
-     * 
-     * @return List of Recipe entities parsed from external API
-     * @throws ExternalApiException if all retry attempts fail
-     */
     @Retryable(
         retryFor = {ResourceAccessException.class, HttpServerErrorException.class},
         maxAttempts = 3,
@@ -96,7 +78,7 @@ public class ExternalRecipeService {
                 }
             }
 
-            logger.info("Successfully processed {} recipes, skipped {} invalid recipes", 
+            logger.info("Successfully processed {} recipes, skipped {} invalid recipes",
                        processedCount, skippedCount);
             
             return recipes;
@@ -116,17 +98,10 @@ public class ExternalRecipeService {
         }
     }
 
-    /**
-     * Maps a JSON node to a Recipe entity.
-     * 
-     * @param recipeNode the JSON node containing recipe data
-     * @return Recipe entity or null if mapping fails
-     */
     private Recipe mapJsonToRecipe(JsonNode recipeNode) {
         try {
             Recipe recipe = new Recipe();
 
-            // Required fields
             String name = getTextValue(recipeNode, "name");
             String cuisine = getTextValue(recipeNode, "cuisine");
             
@@ -138,7 +113,6 @@ public class ExternalRecipeService {
             recipe.setName(name.trim());
             recipe.setCuisine(cuisine.trim());
 
-            // Optional fields with defaults
             recipe.setDifficulty(getTextValue(recipeNode, "difficulty", "Medium"));
             recipe.setPrepTimeMinutes(getIntValue(recipeNode, "prepTimeMinutes"));
             recipe.setCookTimeMinutes(getIntValue(recipeNode, "cookTimeMinutes"));
@@ -148,7 +122,6 @@ public class ExternalRecipeService {
             recipe.setReviewCount(getIntValue(recipeNode, "reviewCount"));
             recipe.setImage(getTextValue(recipeNode, "image"));
 
-            // Handle arrays
             recipe.setIngredients(getStringList(recipeNode, "ingredients"));
             recipe.setInstructions(getStringList(recipeNode, "instructions"));
             recipe.setTags(getStringList(recipeNode, "tags"));
@@ -209,11 +182,6 @@ public class ExternalRecipeService {
         return result;
     }
 
-    /**
-     * Checks if the external API is accessible.
-     * 
-     * @return true if the API is accessible, false otherwise
-     */
     public boolean isApiAccessible() {
         try {
             logger.debug("Checking API accessibility: {}", recipesApiUrl);

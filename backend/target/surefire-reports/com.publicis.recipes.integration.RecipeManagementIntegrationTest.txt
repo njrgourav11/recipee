@@ -1,0 +1,181 @@
+-------------------------------------------------------------------------------
+Test set: com.publicis.recipes.integration.RecipeManagementIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 18, Failures: 15, Errors: 0, Skipped: 0, Time elapsed: 14.025 s <<< FAILURE! - in com.publicis.recipes.integration.RecipeManagementIntegrationTest
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.rootEndpoint_ReturnsApiInformation  Time elapsed: 0.739 s  <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.service"
+	at org.springframework.test.util.JsonPathExpectationsHelper.evaluateJsonPath(JsonPathExpectationsHelper.java:302)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:99)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:111)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.rootEndpoint_ReturnsApiInformation(RecipeManagementIntegrationTest.java:89)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: com.jayway.jsonpath.PathNotFoundException: No results for path: $['service']
+
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.searchRecipes_WithoutQuery_ReturnsAllRecipes  Time elapsed: 0.306 s  <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.totalElements"
+	at org.springframework.test.util.JsonPathExpectationsHelper.evaluateJsonPath(JsonPathExpectationsHelper.java:302)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:99)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:111)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.searchRecipes_WithoutQuery_ReturnsAllRecipes(RecipeManagementIntegrationTest.java:105)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: com.jayway.jsonpath.PathNotFoundException: No results for path: $['totalElements']
+
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.getRecipesByCuisine_ExistingCuisine_ReturnsRecipes  Time elapsed: 0.082 s  <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.content[0].title"
+	at org.springframework.test.util.JsonPathExpectationsHelper.evaluateJsonPath(JsonPathExpectationsHelper.java:302)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:99)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:111)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.getRecipesByCuisine_ExistingCuisine_ReturnsRecipes(RecipeManagementIntegrationTest.java:153)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: com.jayway.jsonpath.PathNotFoundException: No results for path: $['content'][0]['title']
+
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.getRecipeStatistics_ReturnsCorrectStatistics  Time elapsed: 0.086 s  <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.totalCuisines"
+	at org.springframework.test.util.JsonPathExpectationsHelper.evaluateJsonPath(JsonPathExpectationsHelper.java:302)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:99)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:111)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.getRecipeStatistics_ReturnsCorrectStatistics(RecipeManagementIntegrationTest.java:197)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: com.jayway.jsonpath.PathNotFoundException: No results for path: $['totalCuisines']
+
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.endToEndWorkflow_SearchAndRetrieveRecipe  Time elapsed: 0.078 s  <<< FAILURE!
+java.lang.AssertionError: JSON path "$.content.length()" expected:<1> but was:<0>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:123)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:111)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.endToEndWorkflow_SearchAndRetrieveRecipe(RecipeManagementIntegrationTest.java:284)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.searchRecipes_WithInvalidParameters_HandlesGracefully  Time elapsed: 0.077 s  <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<400>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.searchRecipes_WithInvalidParameters_HandlesGracefully(RecipeManagementIntegrationTest.java:258)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.getRecipeSuggestions_ReturnsRandomRecipes  Time elapsed: 0.109 s  <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<400>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.getRecipeSuggestions_ReturnsRandomRecipes(RecipeManagementIntegrationTest.java:184)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.searchRecipes_WithPagination_ReturnsPagedResults  Time elapsed: 0.041 s  <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.totalElements"
+	at org.springframework.test.util.JsonPathExpectationsHelper.evaluateJsonPath(JsonPathExpectationsHelper.java:302)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:99)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:111)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.searchRecipes_WithPagination_ReturnsPagedResults(RecipeManagementIntegrationTest.java:232)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: com.jayway.jsonpath.PathNotFoundException: No results for path: $['totalElements']
+
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.getTopRatedRecipes_ReturnsHighRatedRecipes  Time elapsed: 0.051 s  <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.content[0].title"
+	at org.springframework.test.util.JsonPathExpectationsHelper.evaluateJsonPath(JsonPathExpectationsHelper.java:302)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:99)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:111)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.getTopRatedRecipes_ReturnsHighRatedRecipes(RecipeManagementIntegrationTest.java:178)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: com.jayway.jsonpath.PathNotFoundException: No results for path: $['content'][0]['title']
+
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.getRecipeById_NonExistingId_ReturnsNotFound  Time elapsed: 0.033 s  <<< FAILURE!
+java.lang.AssertionError: Content type not set
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:37)
+	at org.springframework.test.util.AssertionErrors.assertTrue(AssertionErrors.java:70)
+	at org.springframework.test.util.AssertionErrors.assertNotNull(AssertionErrors.java:106)
+	at org.springframework.test.web.servlet.result.ContentResultMatchers.lambda$contentType$0(ContentResultMatchers.java:85)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.getRecipeById_NonExistingId_ReturnsNotFound(RecipeManagementIntegrationTest.java:138)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.searchRecipes_SecondPage_ReturnsRemainingResults  Time elapsed: 0.037 s  <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.totalElements"
+	at org.springframework.test.util.JsonPathExpectationsHelper.evaluateJsonPath(JsonPathExpectationsHelper.java:302)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:99)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:111)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.searchRecipes_SecondPage_ReturnsRemainingResults(RecipeManagementIntegrationTest.java:247)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: com.jayway.jsonpath.PathNotFoundException: No results for path: $['totalElements']
+
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.getLoadingStatus_WithExistingData_ReturnsLoadedStatus  Time elapsed: 0.032 s  <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.dataLoaded"
+	at org.springframework.test.util.JsonPathExpectationsHelper.evaluateJsonPath(JsonPathExpectationsHelper.java:302)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:99)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:111)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.getLoadingStatus_WithExistingData_ReturnsLoadedStatus(RecipeManagementIntegrationTest.java:218)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: com.jayway.jsonpath.PathNotFoundException: No results for path: $['dataLoaded']
+
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.loadSampleData_WhenDataExists_ReturnsInfoMessage  Time elapsed: 0.025 s  <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<202>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.loadSampleData_WhenDataExists_ReturnsInfoMessage(RecipeManagementIntegrationTest.java:205)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.getRecipesByCuisine_NonExistingCuisine_ReturnsEmptyResults  Time elapsed: 0.045 s  <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.totalElements"
+	at org.springframework.test.util.JsonPathExpectationsHelper.evaluateJsonPath(JsonPathExpectationsHelper.java:302)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:99)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:111)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.getRecipesByCuisine_NonExistingCuisine_ReturnsEmptyResults(RecipeManagementIntegrationTest.java:165)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: com.jayway.jsonpath.PathNotFoundException: No results for path: $['totalElements']
+
+com.publicis.recipes.integration.RecipeManagementIntegrationTest.searchRecipes_WithQuery_ReturnsFilteredResults  Time elapsed: 0.036 s  <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.content[0].title"
+	at org.springframework.test.util.JsonPathExpectationsHelper.evaluateJsonPath(JsonPathExpectationsHelper.java:302)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:99)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:111)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.publicis.recipes.integration.RecipeManagementIntegrationTest.searchRecipes_WithQuery_ReturnsFilteredResults(RecipeManagementIntegrationTest.java:119)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: com.jayway.jsonpath.PathNotFoundException: No results for path: $['content'][0]['title']
+

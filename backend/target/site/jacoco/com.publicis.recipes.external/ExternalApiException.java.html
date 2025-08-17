@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExternalApiException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Recipe Management Backend</a> &gt; <a href="index.source.html" class="el_package">com.publicis.recipes.external</a> &gt; <span class="el_source">ExternalApiException.java</span></div><h1>ExternalApiException.java</h1><pre class="source lang-java linenums">package com.publicis.recipes.external;
+
+/**
+ * Custom exception for external API related errors.
+ * 
+ * This exception is thrown when there are issues communicating with
+ * external APIs, such as network timeouts, server errors, or invalid responses.
+ * 
+ * @author Recipe Management Team
+ * @version 1.0.0
+ */
+public class ExternalApiException extends RuntimeException {
+
+    /**
+     * Constructs a new ExternalApiException with the specified detail message.
+     * 
+     * @param message the detail message
+     */
+    public ExternalApiException(String message) {
+<span class="fc" id="L20">        super(message);</span>
+<span class="fc" id="L21">    }</span>
+
+    /**
+     * Constructs a new ExternalApiException with the specified detail message and cause.
+     * 
+     * @param message the detail message
+     * @param cause the cause of the exception
+     */
+    public ExternalApiException(String message, Throwable cause) {
+<span class="nc" id="L30">        super(message, cause);</span>
+<span class="nc" id="L31">    }</span>
+
+    /**
+     * Constructs a new ExternalApiException with the specified cause.
+     * 
+     * @param cause the cause of the exception
+     */
+    public ExternalApiException(Throwable cause) {
+<span class="nc" id="L39">        super(cause);</span>
+<span class="nc" id="L40">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

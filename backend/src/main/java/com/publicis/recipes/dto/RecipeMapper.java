@@ -6,24 +6,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Mapper utility for converting between Recipe entity and RecipeDto.
- * 
- * This component provides methods to map Recipe entities to DTOs and vice versa,
- * ensuring clean separation between internal data models and API contracts.
- * 
- * @author Recipe Management Team
- * @version 1.0.0
- */
 @Component
 public class RecipeMapper {
 
-    /**
-     * Converts a Recipe entity to RecipeDto.
-     * 
-     * @param recipe the Recipe entity to convert
-     * @return RecipeDto representation of the entity
-     */
     public RecipeDto toDto(Recipe recipe) {
         if (recipe == null) {
             return null;
@@ -51,12 +36,6 @@ public class RecipeMapper {
         return dto;
     }
 
-    /**
-     * Converts a RecipeDto to Recipe entity.
-     * 
-     * @param dto the RecipeDto to convert
-     * @return Recipe entity representation of the DTO
-     */
     public Recipe toEntity(RecipeDto dto) {
         if (dto == null) {
             return null;
@@ -83,12 +62,6 @@ public class RecipeMapper {
         return recipe;
     }
 
-    /**
-     * Converts a list of Recipe entities to a list of RecipeDtos.
-     * 
-     * @param recipes the list of Recipe entities to convert
-     * @return list of RecipeDto representations
-     */
     public List<RecipeDto> toDtoList(List<Recipe> recipes) {
         if (recipes == null) {
             return null;
@@ -99,12 +72,6 @@ public class RecipeMapper {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Converts a list of RecipeDtos to a list of Recipe entities.
-     * 
-     * @param dtos the list of RecipeDtos to convert
-     * @return list of Recipe entity representations
-     */
     public List<Recipe> toEntityList(List<RecipeDto> dtos) {
         if (dtos == null) {
             return null;
@@ -115,24 +82,14 @@ public class RecipeMapper {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Updates an existing Recipe entity with data from RecipeDto.
-     * This method preserves the entity's ID and timestamps.
-     * 
-     * @param existingRecipe the existing Recipe entity to update
-     * @param dto the RecipeDto containing updated data
-     * @return the updated Recipe entity
-     */
     public Recipe updateEntity(Recipe existingRecipe, RecipeDto dto) {
         if (existingRecipe == null || dto == null) {
             return existingRecipe;
         }
 
-        // Preserve ID and timestamps
         Long originalId = existingRecipe.getId();
         var originalCreatedAt = existingRecipe.getCreatedAt();
 
-        // Update fields from DTO
         existingRecipe.setName(dto.getName());
         existingRecipe.setCuisine(dto.getCuisine());
         existingRecipe.setDifficulty(dto.getDifficulty());
@@ -147,7 +104,6 @@ public class RecipeMapper {
         existingRecipe.setReviewCount(dto.getReviewCount());
         existingRecipe.setCaloriesPerServing(dto.getCaloriesPerServing());
 
-        // Restore preserved values
         existingRecipe.setId(originalId);
         existingRecipe.setCreatedAt(originalCreatedAt);
 

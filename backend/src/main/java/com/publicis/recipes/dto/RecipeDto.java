@@ -7,15 +7,6 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Data Transfer Object for Recipe entity.
- * 
- * This DTO is used for API responses and requests, providing a clean
- * interface for recipe data without exposing internal entity details.
- * 
- * @author Recipe Management Team
- * @version 1.0.0
- */
 @Schema(description = "Recipe information")
 public class RecipeDto {
 
@@ -98,17 +89,14 @@ public class RecipeDto {
     @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
 
-    // Default constructor
     public RecipeDto() {}
 
-    // Constructor with essential fields
     public RecipeDto(String name, String cuisine, String difficulty) {
         this.name = name;
         this.cuisine = cuisine;
         this.difficulty = difficulty;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
