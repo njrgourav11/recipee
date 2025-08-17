@@ -251,7 +251,7 @@
   }
 }
 
-// Dark mode support
+
 @media (prefers-color-scheme: dark) {
   .recipe-card {
     background: #1f2937;
@@ -272,7 +272,7 @@
   }
 }
 
-// Responsive adjustments
+
 @media (max-width: 768px) {
   .recipe-card {
     &__content {

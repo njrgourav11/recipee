@@ -27,7 +27,6 @@
     opacity: 0.6;
   }
 
-  // Sizes
   &--small {
     padding: 8px 16px;
     font-size: 14px;
@@ -49,7 +48,6 @@
     min-height: 48px;
   }
 
-  // Variants
   &--primary {
     background-color: #3b82f6;
     color: white;
@@ -115,12 +113,10 @@
     }
   }
 
-  // Full width
   &--full-width {
     width: 100%;
   }
 
-  // Loading state
   &--loading {
     pointer-events: none;
   }
@@ -157,7 +153,6 @@
   }
 }
 
-// Dark mode support
 @media (prefers-color-scheme: dark) {
   .button {
     &--ghost {
@@ -174,7 +169,6 @@
   }
 }
 
-// Responsive adjustments
 @media (max-width: 768px) {
   .button {
     &--large {

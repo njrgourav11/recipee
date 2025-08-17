@@ -1,9 +1,3 @@
-/**
- * Button atom component
- * 
- * A reusable button component with various styles and states.
- */
-
 import React from 'react';
 import './Button.scss';
 

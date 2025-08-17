@@ -8253,3 +8253,108 @@ com.publicis.recipes.external.ExternalApiException: API Error
 2025-08-17 21:26:57 [main] DEBUG [] c.p.recipes.service.RecipeService - Getting top-rated recipes
 2025-08-17 21:26:57 [main] DEBUG [] c.p.recipes.service.RecipeService - Getting recent recipes
 2025-08-17 21:26:57 [SpringApplicationShutdownHook] INFO  [] o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-08-17 21:30:41 [http-nio-8080-exec-5] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'piz', page: 0, size: 20, sort: name asc
+2025-08-17 21:30:41 [http-nio-8080-exec-5] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'piz', page: 0, size: 20
+2025-08-17 21:30:41 [http-nio-8080-exec-5] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'piz'
+2025-08-17 21:30:41 [http-nio-8080-exec-5] DEBUG [] c.p.recipes.service.RecipeService - Search returned 1 recipes out of 1 total
+2025-08-17 21:30:41 [http-nio-8080-exec-5] INFO  [] c.p.r.controller.RecipeController - Search completed - found 1 recipes out of 1 total
+2025-08-17 21:38:05 [http-nio-8080-exec-1] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'pizz', page: 0, size: 20, sort: name asc
+2025-08-17 21:38:05 [http-nio-8080-exec-1] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'pizz', page: 0, size: 20
+2025-08-17 21:38:05 [http-nio-8080-exec-1] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'pizz'
+2025-08-17 21:38:05 [http-nio-8080-exec-1] DEBUG [] c.p.recipes.service.RecipeService - Search returned 1 recipes out of 1 total
+2025-08-17 21:38:05 [http-nio-8080-exec-1] INFO  [] c.p.r.controller.RecipeController - Search completed - found 1 recipes out of 1 total
+2025-08-17 21:38:12 [http-nio-8080-exec-8] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'hello', page: 0, size: 20, sort: name asc
+2025-08-17 21:38:12 [http-nio-8080-exec-8] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'hello', page: 0, size: 20
+2025-08-17 21:38:12 [http-nio-8080-exec-8] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'hello'
+2025-08-17 21:38:12 [http-nio-8080-exec-8] DEBUG [] c.p.recipes.service.RecipeService - Search returned 0 recipes out of 0 total
+2025-08-17 21:38:12 [http-nio-8080-exec-8] INFO  [] c.p.r.controller.RecipeController - Search completed - found 0 recipes out of 0 total
+2025-08-17 21:38:12 [http-nio-8080-exec-2] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'hello', page: 0, size: 20, sort: name asc
+2025-08-17 21:38:12 [http-nio-8080-exec-2] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'hello', page: 0, size: 20
+2025-08-17 21:38:12 [http-nio-8080-exec-2] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'hello'
+2025-08-17 21:38:12 [http-nio-8080-exec-2] DEBUG [] c.p.recipes.service.RecipeService - Search returned 0 recipes out of 0 total
+2025-08-17 21:38:12 [http-nio-8080-exec-2] INFO  [] c.p.r.controller.RecipeController - Search completed - found 0 recipes out of 0 total
+2025-08-17 21:38:26 [http-nio-8080-exec-4] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'pizz', page: 0, size: 20, sort: name asc
+2025-08-17 21:38:26 [http-nio-8080-exec-4] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'pizz', page: 0, size: 20
+2025-08-17 21:38:26 [http-nio-8080-exec-4] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'pizz'
+2025-08-17 21:38:26 [http-nio-8080-exec-4] DEBUG [] c.p.recipes.service.RecipeService - Search returned 1 recipes out of 1 total
+2025-08-17 21:38:26 [http-nio-8080-exec-4] INFO  [] c.p.r.controller.RecipeController - Search completed - found 1 recipes out of 1 total
+2025-08-17 21:38:28 [http-nio-8080-exec-3] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'pizz', page: 0, size: 20, sort: name asc
+2025-08-17 21:38:28 [http-nio-8080-exec-3] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'pizz', page: 0, size: 20
+2025-08-17 21:38:28 [http-nio-8080-exec-3] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'pizz'
+2025-08-17 21:38:28 [http-nio-8080-exec-3] DEBUG [] c.p.recipes.service.RecipeService - Search returned 1 recipes out of 1 total
+2025-08-17 21:38:28 [http-nio-8080-exec-3] INFO  [] c.p.r.controller.RecipeController - Search completed - found 1 recipes out of 1 total
+2025-08-17 21:41:30 [http-nio-8080-exec-5] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'hello', page: 0, size: 20, sort: name asc
+2025-08-17 21:41:30 [http-nio-8080-exec-5] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'hello', page: 0, size: 20
+2025-08-17 21:41:30 [http-nio-8080-exec-5] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'hello'
+2025-08-17 21:41:30 [http-nio-8080-exec-5] DEBUG [] c.p.recipes.service.RecipeService - Search returned 0 recipes out of 0 total
+2025-08-17 21:41:30 [http-nio-8080-exec-5] INFO  [] c.p.r.controller.RecipeController - Search completed - found 0 recipes out of 0 total
+2025-08-17 21:41:30 [http-nio-8080-exec-9] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'hello', page: 0, size: 20, sort: name asc
+2025-08-17 21:41:30 [http-nio-8080-exec-9] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'hello', page: 0, size: 20
+2025-08-17 21:41:30 [http-nio-8080-exec-9] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'hello'
+2025-08-17 21:41:30 [http-nio-8080-exec-9] DEBUG [] c.p.recipes.service.RecipeService - Search returned 0 recipes out of 0 total
+2025-08-17 21:41:30 [http-nio-8080-exec-9] INFO  [] c.p.r.controller.RecipeController - Search completed - found 0 recipes out of 0 total
+2025-08-17 21:43:05 [http-nio-8080-exec-1] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'hello', page: 0, size: 20, sort: name asc
+2025-08-17 21:43:05 [http-nio-8080-exec-1] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'hello', page: 0, size: 20
+2025-08-17 21:43:05 [http-nio-8080-exec-1] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'hello'
+2025-08-17 21:43:05 [http-nio-8080-exec-1] DEBUG [] c.p.recipes.service.RecipeService - Search returned 0 recipes out of 0 total
+2025-08-17 21:43:05 [http-nio-8080-exec-1] INFO  [] c.p.r.controller.RecipeController - Search completed - found 0 recipes out of 0 total
+2025-08-17 21:43:22 [http-nio-8080-exec-8] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'italian', page: 0, size: 20, sort: name asc
+2025-08-17 21:43:22 [http-nio-8080-exec-8] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'italian', page: 0, size: 20
+2025-08-17 21:43:22 [http-nio-8080-exec-8] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'italian'
+2025-08-17 21:43:22 [http-nio-8080-exec-8] DEBUG [] c.p.recipes.service.RecipeService - Search returned 6 recipes out of 6 total
+2025-08-17 21:43:22 [http-nio-8080-exec-8] INFO  [] c.p.r.controller.RecipeController - Search completed - found 6 recipes out of 6 total
+2025-08-17 21:43:44 [http-nio-8080-exec-4] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'no result', page: 0, size: 20, sort: name asc
+2025-08-17 21:43:44 [http-nio-8080-exec-4] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'no result', page: 0, size: 20
+2025-08-17 21:43:44 [http-nio-8080-exec-4] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'no result'
+2025-08-17 21:43:44 [http-nio-8080-exec-4] DEBUG [] c.p.recipes.service.RecipeService - Search returned 0 recipes out of 0 total
+2025-08-17 21:43:44 [http-nio-8080-exec-4] INFO  [] c.p.r.controller.RecipeController - Search completed - found 0 recipes out of 0 total
+2025-08-17 21:45:32 [http-nio-8080-exec-5] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'ita', page: 0, size: 20, sort: name asc
+2025-08-17 21:45:32 [http-nio-8080-exec-5] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'ita', page: 0, size: 20
+2025-08-17 21:45:32 [http-nio-8080-exec-5] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'ita'
+2025-08-17 21:45:32 [http-nio-8080-exec-5] DEBUG [] c.p.recipes.service.RecipeService - Search returned 6 recipes out of 6 total
+2025-08-17 21:45:32 [http-nio-8080-exec-5] INFO  [] c.p.r.controller.RecipeController - Search completed - found 6 recipes out of 6 total
+2025-08-17 21:46:23 [http-nio-8080-exec-10] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'ital', page: 0, size: 20, sort: name asc
+2025-08-17 21:46:23 [http-nio-8080-exec-10] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'ital', page: 0, size: 20
+2025-08-17 21:46:23 [http-nio-8080-exec-10] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'ital'
+2025-08-17 21:46:23 [http-nio-8080-exec-10] DEBUG [] c.p.recipes.service.RecipeService - Search returned 6 recipes out of 6 total
+2025-08-17 21:46:23 [http-nio-8080-exec-10] INFO  [] c.p.r.controller.RecipeController - Search completed - found 6 recipes out of 6 total
+2025-08-17 21:49:47 [http-nio-8080-exec-8] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'bur', page: 0, size: 20, sort: name asc
+2025-08-17 21:49:47 [http-nio-8080-exec-8] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'bur', page: 0, size: 20
+2025-08-17 21:49:47 [http-nio-8080-exec-8] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'bur'
+2025-08-17 21:49:47 [http-nio-8080-exec-8] DEBUG [] c.p.recipes.service.RecipeService - Search returned 0 recipes out of 0 total
+2025-08-17 21:49:47 [http-nio-8080-exec-8] INFO  [] c.p.r.controller.RecipeController - Search completed - found 0 recipes out of 0 total
+2025-08-17 21:49:50 [http-nio-8080-exec-4] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'burger', page: 0, size: 20, sort: name asc
+2025-08-17 21:49:50 [http-nio-8080-exec-4] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'burger', page: 0, size: 20
+2025-08-17 21:49:50 [http-nio-8080-exec-4] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'burger'
+2025-08-17 21:49:50 [http-nio-8080-exec-4] DEBUG [] c.p.recipes.service.RecipeService - Search returned 0 recipes out of 0 total
+2025-08-17 21:49:50 [http-nio-8080-exec-4] INFO  [] c.p.r.controller.RecipeController - Search completed - found 0 recipes out of 0 total
+2025-08-17 21:51:34 [http-nio-8080-exec-7] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'bur', page: 0, size: 20, sort: name asc
+2025-08-17 21:51:34 [http-nio-8080-exec-7] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'bur', page: 0, size: 20
+2025-08-17 21:51:34 [http-nio-8080-exec-7] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'bur'
+2025-08-17 21:51:34 [http-nio-8080-exec-7] DEBUG [] c.p.recipes.service.RecipeService - Search returned 0 recipes out of 0 total
+2025-08-17 21:51:34 [http-nio-8080-exec-7] INFO  [] c.p.r.controller.RecipeController - Search completed - found 0 recipes out of 0 total
+2025-08-17 21:51:51 [http-nio-8080-exec-9] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'chicken', page: 0, size: 20, sort: name asc
+2025-08-17 21:51:51 [http-nio-8080-exec-9] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'chicken', page: 0, size: 20
+2025-08-17 21:51:51 [http-nio-8080-exec-9] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'chicken'
+2025-08-17 21:51:51 [http-nio-8080-exec-9] DEBUG [] c.p.recipes.service.RecipeService - Search returned 5 recipes out of 5 total
+2025-08-17 21:51:51 [http-nio-8080-exec-9] INFO  [] c.p.r.controller.RecipeController - Search completed - found 5 recipes out of 5 total
+2025-08-17 21:51:55 [http-nio-8080-exec-1] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'chicke', page: 0, size: 20, sort: name asc
+2025-08-17 21:51:55 [http-nio-8080-exec-1] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'chicke', page: 0, size: 20
+2025-08-17 21:51:55 [http-nio-8080-exec-1] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'chicke'
+2025-08-17 21:51:55 [http-nio-8080-exec-1] DEBUG [] c.p.recipes.service.RecipeService - Search returned 5 recipes out of 5 total
+2025-08-17 21:51:55 [http-nio-8080-exec-1] INFO  [] c.p.r.controller.RecipeController - Search completed - found 5 recipes out of 5 total
+2025-08-17 21:55:23 [http-nio-8080-exec-4] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'kela', page: 0, size: 20, sort: name asc
+2025-08-17 21:55:23 [http-nio-8080-exec-4] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'kela', page: 0, size: 20
+2025-08-17 21:55:23 [http-nio-8080-exec-4] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'kela'
+2025-08-17 21:55:23 [http-nio-8080-exec-4] DEBUG [] c.p.recipes.service.RecipeService - Search returned 0 recipes out of 0 total
+2025-08-17 21:55:23 [http-nio-8080-exec-4] INFO  [] c.p.r.controller.RecipeController - Search completed - found 0 recipes out of 0 total
+2025-08-17 21:56:40 [http-nio-8080-exec-7] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'ita', page: 0, size: 20, sort: name asc
+2025-08-17 21:56:40 [http-nio-8080-exec-7] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'ita', page: 0, size: 20
+2025-08-17 21:56:40 [http-nio-8080-exec-7] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'ita'
+2025-08-17 21:56:40 [http-nio-8080-exec-7] DEBUG [] c.p.recipes.service.RecipeService - Search returned 6 recipes out of 6 total
+2025-08-17 21:56:40 [http-nio-8080-exec-7] INFO  [] c.p.r.controller.RecipeController - Search completed - found 6 recipes out of 6 total
+2025-08-17 21:57:53 [http-nio-8080-exec-9] INFO  [] c.p.r.controller.RecipeController - Search request - query: 'ita', page: 0, size: 20, sort: name asc
+2025-08-17 21:57:53 [http-nio-8080-exec-9] DEBUG [] c.p.recipes.service.RecipeService - Searching recipes with query: 'ita', page: 0, size: 20
+2025-08-17 21:57:53 [http-nio-8080-exec-9] DEBUG [] c.p.recipes.service.RecipeService - Using database search for query: 'ita'
+2025-08-17 21:57:53 [http-nio-8080-exec-9] DEBUG [] c.p.recipes.service.RecipeService - Search returned 6 recipes out of 6 total
+2025-08-17 21:57:53 [http-nio-8080-exec-9] INFO  [] c.p.r.controller.RecipeController - Search completed - found 6 recipes out of 6 total

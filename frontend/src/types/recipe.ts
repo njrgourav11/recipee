@@ -1,10 +1,3 @@
-/**
- * Recipe type definitions for the Recipe Management System frontend.
- * 
- * These types match the backend API contracts and provide type safety
- * throughout the React application.
- */
-
 export interface Recipe {
   id: number;
   name: string;
@@ -91,7 +84,6 @@ export interface RecipeStatistics {
   searchIndexReady: boolean;
 }
 
-// Component prop types
 export interface RecipeCardProps {
   recipe: Recipe;
   onClick?: (recipe: Recipe) => void;
@@ -133,7 +125,6 @@ export interface PaginationProps {
   className?: string;
 }
 
-// Hook return types
 export interface UseRecipeSearchReturn {
   searchState: SearchState;
   searchRecipes: (query: string, page?: number) => Promise<void>;
@@ -154,7 +145,6 @@ export interface UseLocalStorageReturn<T> {
   removeValue: () => void;
 }
 
-// API service types
 export interface ApiConfig {
   baseURL: string;
   timeout: number;
@@ -176,18 +166,15 @@ export interface LoadRecipesResponse {
   count?: number;
 }
 
-// Utility types
 export type RecipeSortField = keyof Pick<Recipe, 'name' | 'rating' | 'cook_time_minutes' | 'prep_time_minutes'>;
 export type SortDirection = 'asc' | 'desc';
 export type DifficultyLevel = Recipe['difficulty'];
 
-// Form types
 export interface SearchFormData {
   query: string;
   filters: SearchFilters;
 }
 
-// Context types
 export interface RecipeContextValue {
   searchState: SearchState;
   searchRecipes: (query: string, page?: number) => Promise<void>;
@@ -197,14 +184,12 @@ export interface RecipeContextValue {
   getRecipeById: (id: number) => Promise<Recipe | null>;
 }
 
-// Error types
 export interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
   errorInfo: string | null;
 }
 
-// Theme types
 export interface Theme {
   colors: {
     primary: string;

@@ -1,13 +1,3 @@
-/**
- * Custom hook for recipe search functionality.
- * 
- * This hook manages the complete recipe search state including:
- * - Search query and results
- * - Loading states and error handling
- * - Pagination and filtering
- * - Debounced search input
- */
-
 import { useState, useCallback, useEffect } from 'react';
 import { RecipeApiService, ApiUtils } from '../services/api';
 import { useDebounce } from './useDebounce';
@@ -35,13 +25,6 @@ const initialState: SearchState = {
   filters: initialFilters,
 };
 
-/**
- * Hook for managing recipe search functionality
- * 
- * @param initialQuery - Initial search query
- * @param autoSearch - Whether to automatically search when query changes
- * @returns Object containing search state and methods
- */
 export function useRecipeSearch(
   initialQuery = '',
   autoSearch = true
@@ -51,14 +34,9 @@ export function useRecipeSearch(
     query: initialQuery,
   });
 
-  // Debounce the search query to avoid excessive API calls
   const { debouncedValue: debouncedQuery } = useDebounce(searchState.query, 300);
 
-  /**
-   * Search recipes with the given query and page
-   */
   const searchRecipes = useCallback(async (query: string, page = 0) => {
-    // Don't search if query is less than 3 characters and not empty
     if (query.length > 0 && query.length < 3) {
       setSearchState(prev => ({
         ...prev,
@@ -107,9 +85,6 @@ export function useRecipeSearch(
     }
   }, [searchState.filters.sortBy, searchState.filters.sortOrder]);
 
-  /**
-   * Load more recipes (pagination)
-   */
   const loadMore = useCallback(async () => {
     if (searchState.loading || searchState.currentPage >= searchState.totalPages - 1) {
       return;
@@ -118,9 +93,6 @@ export function useRecipeSearch(
     await searchRecipes(searchState.query, searchState.currentPage + 1);
   }, [searchRecipes, searchState.loading, searchState.currentPage, searchState.totalPages, searchState.query]);
 
-  /**
-   * Update search filters
-   */
   const setFilters = useCallback((newFilters: Partial<SearchFilters>) => {
     setSearchState(prev => {
       const updatedFilters = { ...prev.filters, ...newFilters };
@@ -131,19 +103,13 @@ export function useRecipeSearch(
     });
   }, []);
 
-  /**
-   * Clear search results and reset state
-   */
   const clearSearch = useCallback(() => {
     setSearchState({
       ...initialState,
-      filters: searchState.filters, // Preserve filters
+      filters: searchState.filters,
     });
   }, [searchState.filters]);
 
-  /**
-   * Update search query
-   */
   const setQuery = useCallback((query: string) => {
     setSearchState(prev => ({
       ...prev,
@@ -151,13 +117,9 @@ export function useRecipeSearch(
     }));
   }, []);
 
-  /**
-   * Filter recipes client-side based on current filters
-   */
   const getFilteredRecipes = useCallback((): Recipe[] => {
     let filtered = [...searchState.recipes];
 
-    // Filter by tags
     if (searchState.filters.tags.length > 0) {
       filtered = filtered.filter(recipe =>
         recipe.tags.some(tag =>
@@ -168,35 +130,30 @@ export function useRecipeSearch(
       );
     }
 
-    // Filter by cuisine
     if (searchState.filters.cuisine) {
       filtered = filtered.filter(recipe =>
         recipe.cuisine.toLowerCase().includes(searchState.filters.cuisine!.toLowerCase())
       );
     }
 
-    // Filter by difficulty
     if (searchState.filters.difficulty) {
       filtered = filtered.filter(recipe =>
         recipe.difficulty === searchState.filters.difficulty
       );
     }
 
-    // Filter by max cook time
     if (searchState.filters.maxCookTime) {
       filtered = filtered.filter(recipe =>
         recipe.cook_time_minutes <= searchState.filters.maxCookTime!
       );
     }
 
-    // Filter by min rating
     if (searchState.filters.minRating) {
       filtered = filtered.filter(recipe =>
         recipe.rating >= searchState.filters.minRating!
       );
     }
 
-    // Sort recipes
     filtered.sort((a, b) => {
       const { sortBy, sortOrder } = searchState.filters;
       let aValue: string | number;
@@ -238,22 +195,18 @@ export function useRecipeSearch(
     return filtered;
   }, [searchState.recipes, searchState.filters]);
 
-  // Auto-search when debounced query changes
   useEffect(() => {
     if (autoSearch && debouncedQuery !== searchState.query) {
-      // Update the query in state to match debounced value
       setSearchState(prev => ({ ...prev, query: debouncedQuery }));
     }
   }, [debouncedQuery, autoSearch, searchState.query]);
 
-  // Trigger search when debounced query changes
   useEffect(() => {
     if (autoSearch) {
       searchRecipes(debouncedQuery, 0);
     }
   }, [debouncedQuery, autoSearch, searchRecipes]);
 
-  // Re-search when filters change (except for client-side filters)
   useEffect(() => {
     if (searchState.query && (
       searchState.filters.sortBy !== initialFilters.sortBy ||

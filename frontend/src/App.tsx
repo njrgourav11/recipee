@@ -15,10 +15,23 @@ function App() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
+  const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>([]);
+  const [ratingFilter, setRatingFilter] = useState<number>(0);
+  const [maxCookTime, setMaxCookTime] = useState<number>(0);
+  const [visibleAttributes, setVisibleAttributes] = useState({
+    rating: true,
+    cookTime: true,
+    difficulty: true,
+    cuisine: true,
+    servings: true,
+    calories: false,
+    reviewCount: false,
+  });
   const { searchState, searchRecipes, setQuery: setSearchQuery, clearSearch } = useRecipeSearch('', false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load recent searches from localStorage on mount
   useEffect(() => {
     const savedSearches = localStorage.getItem('recentSearches');
     if (savedSearches) {
@@ -31,12 +44,10 @@ function App() {
     }
   }, []);
 
-  // Add entrance animation
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (searchTimeoutRef.current) {
@@ -45,17 +56,14 @@ function App() {
     };
   }, []);
 
-  // Function to add a search to recent searches
   const addToRecentSearches = (searchQuery: string) => {
     if (!searchQuery || searchQuery.length < 3) return;
     
     const trimmedQuery = searchQuery.trim().toLowerCase();
     setRecentSearches(prev => {
-      // Remove if already exists and add to front
       const filtered = prev.filter(search => search.toLowerCase() !== trimmedQuery);
-      const updated = [searchQuery.trim(), ...filtered].slice(0, 5); // Keep only 5 recent searches
+      const updated = [searchQuery.trim(), ...filtered].slice(0, 5);
       
-      // Save to localStorage
       localStorage.setItem('recentSearches', JSON.stringify(updated));
       return updated;
     });
@@ -63,8 +71,8 @@ function App() {
 
   const handleSearch = () => {
     if (query.length >= 3) {
-      setHasSearched(true); // Mark that user has searched
-      addToRecentSearches(query); // Add to recent searches
+      setHasSearched(true);
+      addToRecentSearches(query);
       setSearchQuery(query);
       searchRecipes(query, 0);
     }
@@ -74,20 +82,17 @@ function App() {
     setQuery(newQuery);
     setSearchQuery(newQuery);
     
-    // Clear existing timeout
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
     
-    // Debounced auto-search
     if (newQuery.length >= 3) {
-      setHasSearched(true); // Mark that user has searched
+      setHasSearched(true);
       searchTimeoutRef.current = setTimeout(() => {
-        addToRecentSearches(newQuery); // Add to recent searches
+        addToRecentSearches(newQuery);
         searchRecipes(newQuery, 0);
-      }, 500); // 500ms delay
+      }, 500);
     } else if (newQuery.length === 0) {
-      // Clear results immediately when search is empty
       clearSearch();
     }
   };
@@ -104,28 +109,57 @@ function App() {
   };
 
   const handleRecipeClick = (recipe: any) => {
-    // Future: Open recipe detail modal or navigate to detail page
     console.log('Recipe clicked:', recipe);
   };
 
-  // Get all unique tags from current recipes
   const getAllTags = () => {
     const allTags = searchState.recipes.flatMap(recipe => recipe.tags);
     return [...new Set(allTags)].sort();
   };
 
-  // Filter and sort recipes client-side
+  const getAllCuisines = () => {
+    const allCuisines = searchState.recipes.map(recipe => recipe.cuisine);
+    return [...new Set(allCuisines)].sort();
+  };
+
+  const getAllDifficulties = () => {
+    const allDifficulties = searchState.recipes.map(recipe => recipe.difficulty);
+    return [...new Set(allDifficulties)].sort();
+  };
+
   const getFilteredAndSortedRecipes = () => {
     let filtered = [...searchState.recipes];
 
-    // Filter by selected tags
     if (selectedTags.length > 0) {
       filtered = filtered.filter(recipe =>
         selectedTags.some(tag => recipe.tags.includes(tag))
       );
     }
 
-    // Sort recipes
+    if (selectedCuisines.length > 0) {
+      filtered = filtered.filter(recipe =>
+        selectedCuisines.includes(recipe.cuisine)
+      );
+    }
+
+    if (selectedDifficulties.length > 0) {
+      filtered = filtered.filter(recipe =>
+        selectedDifficulties.includes(recipe.difficulty)
+      );
+    }
+
+    if (ratingFilter > 0) {
+      filtered = filtered.filter(recipe =>
+        recipe.rating >= ratingFilter
+      );
+    }
+
+    if (maxCookTime > 0) {
+      filtered = filtered.filter(recipe =>
+        recipe.cook_time_minutes <= maxCookTime
+      );
+    }
+
     filtered.sort((a, b) => {
       let aValue: string | number;
       let bValue: string | number;
@@ -162,31 +196,65 @@ function App() {
     return filtered;
   };
 
-  // Handle tag filter toggle
   const toggleTagFilter = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
+    setSelectedTags(prev =>
+      prev.includes(tag)
         ? prev.filter(t => t !== tag)
         : [...prev, tag]
     );
   };
 
-  // Clear all filters
+  const toggleCuisineFilter = (cuisine: string) => {
+    setSelectedCuisines(prev =>
+      prev.includes(cuisine)
+        ? prev.filter(c => c !== cuisine)
+        : [...prev, cuisine]
+    );
+  };
+
+  const toggleDifficultyFilter = (difficulty: string) => {
+    setSelectedDifficulties(prev =>
+      prev.includes(difficulty)
+        ? prev.filter(d => d !== difficulty)
+        : [...prev, difficulty]
+    );
+  };
+
+  const toggleAttributeVisibility = (attribute: keyof typeof visibleAttributes) => {
+    setVisibleAttributes(prev => ({
+      ...prev,
+      [attribute]: !prev[attribute]
+    }));
+  };
+
   const clearFilters = () => {
     setSelectedTags([]);
+    setSelectedCuisines([]);
+    setSelectedDifficulties([]);
+    setRatingFilter(0);
+    setMaxCookTime(0);
     setSortBy('name');
     setSortOrder('asc');
   };
 
   return (
-    <div className={`app ${isVisible ? 'app--visible' : ''}`}>
+    <div className={`app ${isVisible ? 'app--visible' : ''} ${isDarkMode ? 'app--dark' : ''}`}>
       <header className="app__header">
         <div className="app__container">
           <div className="app__header-content">
-            <h1 className="app__title">
-              <span className="app__title-icon">🍳</span>
-              Recipe Management System
-            </h1>
+            <div className="app__header-top">
+              <h1 className="app__title">
+                <span className="app__title-icon">🍳</span>
+                Recipe Management System
+              </h1>
+              <button 
+                className="app__dark-mode-toggle"
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {isDarkMode ? '☀️' : '🌙'}
+              </button>
+            </div>
             <p className="app__subtitle">
               Search and discover delicious recipes from around the world
             </p>
@@ -226,7 +294,6 @@ function App() {
                   color="primary" 
                   text="Searching for delicious recipes..." 
                 />
-                {/* Loading skeleton for better UX */}
                 <div className="app__recipe-grid app__recipe-grid--loading">
                   {Array.from({ length: 6 }).map((_, index) => (
                     <div key={index} className="app__recipe-skeleton">
@@ -273,13 +340,12 @@ function App() {
                   </div>
                 </div>
 
-                {/* Sorting and Filtering Controls */}
                 <div className="app__controls">
                   <div className="app__controls-section">
                     <h4>Sort by:</h4>
                     <div className="app__sort-controls">
-                      <select 
-                        value={sortBy} 
+                      <select
+                        value={sortBy}
                         onChange={(e) => setSortBy(e.target.value as 'name' | 'cook_time_minutes' | 'rating')}
                         className="app__sort-select"
                       >
@@ -287,7 +353,7 @@ function App() {
                         <option value="cook_time_minutes">Cook Time</option>
                         <option value="rating">Rating</option>
                       </select>
-                      <button 
+                      <button
                         className={`app__sort-order ${sortOrder === 'desc' ? 'app__sort-order--desc' : ''}`}
                         onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                         title={`Sort ${sortOrder === 'asc' ? 'Descending' : 'Ascending'}`}
@@ -299,50 +365,167 @@ function App() {
                     </div>
                   </div>
 
-                  {getAllTags().length > 0 && (
-                    <div className="app__controls-section">
-                      <div className="app__filter-header">
-                        <h4>Filter by tags:</h4>
-                        {selectedTags.length > 0 && (
-                          <button className="app__clear-filters" onClick={clearFilters}>
-                            Clear all
-                          </button>
-                        )}
-                      </div>
-                      <div className="app__tag-filters">
-                        {getAllTags().slice(0, 10).map(tag => (
-                          <button
-                            key={tag}
-                            className={`app__tag-filter ${selectedTags.includes(tag) ? 'app__tag-filter--active' : ''}`}
-                            onClick={() => toggleTagFilter(tag)}
-                          >
-                            {tag}
-                          </button>
-                        ))}
-                      </div>
+                  <div className="app__controls-section">
+                    <div className="app__filter-header">
+                      <h4>Filters:</h4>
+                      {(selectedTags.length > 0 || selectedCuisines.length > 0 || selectedDifficulties.length > 0 || ratingFilter > 0 || maxCookTime > 0) && (
+                        <button className="app__clear-filters" onClick={clearFilters}>
+                          Clear all filters
+                        </button>
+                      )}
                     </div>
-                  )}
+                    
+                    <div className="app__filters-grid">
+                      {getAllCuisines().length > 0 && (
+                        <div className="app__filter-group">
+                          <h5>Cuisine:</h5>
+                          <div className="app__filter-options">
+                            {getAllCuisines().slice(0, 8).map(cuisine => (
+                              <button
+                                key={cuisine}
+                                className={`app__filter-option ${selectedCuisines.includes(cuisine) ? 'app__filter-option--active' : ''}`}
+                                onClick={() => toggleCuisineFilter(cuisine)}
+                              >
+                                {cuisine}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {getAllDifficulties().length > 0 && (
+                        <div className="app__filter-group">
+                          <h5>Difficulty:</h5>
+                          <div className="app__filter-options">
+                            {getAllDifficulties().map(difficulty => (
+                              <button
+                                key={difficulty}
+                                className={`app__filter-option ${selectedDifficulties.includes(difficulty) ? 'app__filter-option--active' : ''}`}
+                                onClick={() => toggleDifficultyFilter(difficulty)}
+                              >
+                                {difficulty}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="app__filter-group">
+                        <h5>Rating:</h5>
+                        <div className="app__rating-filter">
+                          <input
+                            type="range"
+                            min="0"
+                            max="5"
+                            step="0.5"
+                            value={ratingFilter}
+                            onChange={(e) => setRatingFilter(Number(e.target.value))}
+                            className="app__range-input"
+                          />
+                          <span className="app__range-value">
+                            {ratingFilter > 0 ? `${ratingFilter}+ stars` : 'Any rating'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="app__filter-group">
+                        <h5>Max Cook Time:</h5>
+                        <div className="app__time-filter">
+                          <input
+                            type="range"
+                            min="0"
+                            max="120"
+                            step="5"
+                            value={maxCookTime}
+                            onChange={(e) => setMaxCookTime(Number(e.target.value))}
+                            className="app__range-input"
+                          />
+                          <span className="app__range-value">
+                            {maxCookTime > 0 ? `${maxCookTime} min` : 'Any time'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {getAllTags().length > 0 && (
+                        <div className="app__filter-group">
+                          <h5>Tags:</h5>
+                          <div className="app__filter-options">
+                            {getAllTags().slice(0, 10).map(tag => (
+                              <button
+                                key={tag}
+                                className={`app__filter-option ${selectedTags.includes(tag) ? 'app__filter-option--active' : ''}`}
+                                onClick={() => toggleTagFilter(tag)}
+                              >
+                                {tag}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="app__controls-section">
+                    <h4>Display Attributes:</h4>
+                    <div className="app__attribute-toggles">
+                      {Object.entries(visibleAttributes).map(([key, visible]) => (
+                        <label key={key} className="app__attribute-toggle">
+                          <input
+                            type="checkbox"
+                            checked={visible}
+                            onChange={() => toggleAttributeVisibility(key as keyof typeof visibleAttributes)}
+                          />
+                          <span className="app__attribute-label">
+                            {key === 'cookTime' ? 'Cook Time' :
+                             key === 'reviewCount' ? 'Review Count' :
+                             key.charAt(0).toUpperCase() + key.slice(1)}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Results count after filtering */}
                 {(() => {
                   const filteredRecipes = getFilteredAndSortedRecipes();
                   return (
                     <>
-                      {selectedTags.length > 0 && (
+                      {(selectedTags.length > 0 || selectedCuisines.length > 0 || selectedDifficulties.length > 0 || ratingFilter > 0 || maxCookTime > 0) && (
                         <div className="app__filter-results">
                           <p>Showing {filteredRecipes.length} of {searchState.recipes.length} recipes</p>
-                          {selectedTags.length > 0 && (
-                            <div className="app__active-filters">
-                              <span>Active filters:</span>
-                              {selectedTags.map(tag => (
-                                <span key={tag} className="app__active-filter">
-                                  {tag}
-                                  <button onClick={() => toggleTagFilter(tag)}>×</button>
-                                </span>
-                              ))}
-                            </div>
-                          )}
+                          <div className="app__active-filters">
+                            <span>Active filters:</span>
+                            {selectedCuisines.map(cuisine => (
+                              <span key={`cuisine-${cuisine}`} className="app__active-filter app__active-filter--cuisine">
+                                Cuisine: {cuisine}
+                                <button onClick={() => toggleCuisineFilter(cuisine)}>×</button>
+                              </span>
+                            ))}
+                            {selectedDifficulties.map(difficulty => (
+                              <span key={`difficulty-${difficulty}`} className="app__active-filter app__active-filter--difficulty">
+                                {difficulty}
+                                <button onClick={() => toggleDifficultyFilter(difficulty)}>×</button>
+                              </span>
+                            ))}
+                            {ratingFilter > 0 && (
+                              <span className="app__active-filter app__active-filter--rating">
+                                Rating: {ratingFilter}+ stars
+                                <button onClick={() => setRatingFilter(0)}>×</button>
+                              </span>
+                            )}
+                            {maxCookTime > 0 && (
+                              <span className="app__active-filter app__active-filter--time">
+                                Max: {maxCookTime} min
+                                <button onClick={() => setMaxCookTime(0)}>×</button>
+                              </span>
+                            )}
+                            {selectedTags.map(tag => (
+                              <span key={`tag-${tag}`} className="app__active-filter app__active-filter--tag">
+                                {tag}
+                                <button onClick={() => toggleTagFilter(tag)}>×</button>
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       )}
 
@@ -355,6 +538,7 @@ function App() {
                               onClick={handleRecipeClick}
                               className="app__recipe-card"
                               style={{ animationDelay: `${index * 0.1}s` }}
+                              visibleAttributes={visibleAttributes}
                             />
                           ))}
                         </div>
@@ -372,11 +556,11 @@ function App() {
                         </div>
                       )}
 
-                      {filteredRecipes.length === 0 && selectedTags.length > 0 && (
+                      {filteredRecipes.length === 0 && (selectedTags.length > 0 || selectedCuisines.length > 0 || selectedDifficulties.length > 0 || ratingFilter > 0 || maxCookTime > 0) && (
                         <div className="app__no-filter-results">
                           <div className="app__no-filter-results-icon">🏷️</div>
                           <h3>No recipes match your filters</h3>
-                          <p>Try removing some tag filters or search for different recipes.</p>
+                          <p>Try removing some filters or search for different recipes.</p>
                           <button className="app__clear-filters-btn" onClick={clearFilters}>
                             Clear all filters
                           </button>
@@ -385,23 +569,6 @@ function App() {
                     </>
                   );
                 })()}
-              </div>
-            )}
-
-            {!searchState.loading && !searchState.error && searchState.recipes.length === 0 && query.length >= 3 && (
-              <div className="app__no-results">
-                <div className="app__no-results-icon">🔍</div>
-                <h3>No recipes found</h3>
-                <p>Try searching with different keywords or check your spelling.</p>
-                <div className="app__no-results-suggestions">
-                  <p>Popular searches:</p>
-                  <div className="app__suggestion-tags">
-                    <button className="app__suggestion-tag" onClick={() => {setQuery('pasta'); handleSearch();}}>pasta</button>
-                    <button className="app__suggestion-tag" onClick={() => {setQuery('chicken'); handleSearch();}}>chicken</button>
-                    <button className="app__suggestion-tag" onClick={() => {setQuery('vegetarian'); handleSearch();}}>vegetarian</button>
-                    <button className="app__suggestion-tag" onClick={() => {setQuery('dessert'); handleSearch();}}>dessert</button>
-                  </div>
-                </div>
               </div>
             )}
 
@@ -519,7 +686,7 @@ function App() {
 
       <footer className="app__footer">
         <div className="app__container">
-          <p>&copy; 2024 Recipe Management System. Built with React & Spring Boot.</p>
+          <p>&copy; 2025 Recipe Management System. Built with React & Spring Boot.❤️</p>
         </div>
       </footer>
     </div>

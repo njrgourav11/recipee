@@ -9,7 +9,7 @@
   justify-content: center;
   gap: 16px;
 
-  // Sizes
+  
   &--small {
     .loading__spinner-circle {
       width: 24px;
@@ -76,7 +76,7 @@
     }
   }
 
-  // Colors
+  
   &--primary {
     .loading__spinner-circle {
       border-color: #e5e7eb;
@@ -146,7 +146,6 @@
     }
   }
 
-  // Spinner variant
   &__spinner {
     display: flex;
     align-items: center;
@@ -159,7 +158,6 @@
     animation: spin 1s linear infinite;
   }
 
-  // Dots variant
   &__dots {
     display: flex;
     gap: 8px;
@@ -183,7 +181,6 @@
     }
   }
 
-  // Pulse variant
   &__pulse {
     display: flex;
     align-items: center;
@@ -195,7 +192,6 @@
     animation: pulse 2s ease-in-out infinite;
   }
 
-  // Skeleton variant
   &__skeleton {
     width: 100%;
     max-width: 300px;
@@ -226,7 +222,6 @@
     }
   }
 
-  // Text
   &__text {
     margin: 0;
     font-weight: 500;
@@ -234,7 +229,6 @@
   }
 }
 
-// Animations
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -273,7 +267,6 @@
   }
 }
 
-// Dark mode support
 @media (prefers-color-scheme: dark) {
   .loading {
     &--primary {
