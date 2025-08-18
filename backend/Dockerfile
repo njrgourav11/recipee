@@ -6,7 +6,6 @@ COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Create the final image
-FROM openjdk:17-jre-slim
+FROM openjdk:17-slim-buster
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
